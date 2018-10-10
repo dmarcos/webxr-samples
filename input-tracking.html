@@ -187,7 +187,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 let gripMatrix = mat4.create();
 mat4.identity(gripMatrix);
 mat4.translate(gripMatrix, gripMatrix, [0, 0, 1.75]);
-scene.inputRenderer.addController(gripMatrix);
+//scene.inputRenderer.addController(gripMatrix);
 
         for (let inputSource of inputSources) {
           let inputPose = frame.getInputPose(inputSource, frameOfRef);
@@ -203,6 +203,9 @@ scene.inputRenderer.addController(gripMatrix);
             // If we have a grip matrix use it to render a mesh showing the
             // position of the controller.
             scene.inputRenderer.addController(inputPose.gripMatrix);
+
+mat4.translate(inputPose.gripMatrix, inputPose.gripMatrix, [0.3, 0, 1.75]);
+scene.inputRenderer.addController(inputPose.gripMatrix);
           }
 
           if (inputPose.targetRay) {
