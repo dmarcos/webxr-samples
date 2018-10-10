@@ -186,7 +186,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 let gripMatrix = mat4.create();
 mat4.identity(gripMatrix);
-mat4.translate(gripMatrix, gripMatrix, [-0.01, 1.28, 0.25]);
+mat4.translate(gripMatrix, gripMatrix, [-0.01, 1.28, -0.5]);
 scene.inputRenderer.addController(gripMatrix);
 
         for (let inputSource of inputSources) {
