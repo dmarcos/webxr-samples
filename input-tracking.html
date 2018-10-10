@@ -188,7 +188,7 @@ let gripMatrix = mat4.create();
 mat4.identity(gripMatrix);
 mat4.translate(gripMatrix, gripMatrix, [0, 0, 1.75]);
 scene.inputRenderer.addController(gripMatrix);
-
+/*
         for (let inputSource of inputSources) {
           let inputPose = frame.getInputPose(inputSource, frameOfRef);
 
@@ -235,6 +235,7 @@ scene.inputRenderer.addController(gripMatrix);
             scene.inputRenderer.addCursor(cursorPos);
           }
         }
+*/
       }
 
       function onXRFrame(t, frame) {
