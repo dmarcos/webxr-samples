@@ -184,6 +184,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       function updateInputSources(session, frame, frameOfRef) {
         let inputSources = session.getInputSources();
 
+let gripMatrix = mat4.create();
+mat4.identity(gripMatrix);
+scene.inputRenderer.addController(gripMatrix);
+
         for (let inputSource of inputSources) {
           let inputPose = frame.getInputPose(inputSource, frameOfRef);
 
@@ -227,7 +231,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
                 ]);
             // vec3.transformMat4(cursorPos, cursorPos, inputPose.targetRay.transformMatrix);
 
-            //scene.inputRenderer.addCursor(cursorPos);
+            scene.inputRenderer.addCursor(cursorPos);
           }
         }
       }
