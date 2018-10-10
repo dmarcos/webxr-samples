@@ -204,8 +204,8 @@ mat4.translate(gripMatrix, gripMatrix, [0, 0, 1.75]);
             // position of the controller.
             scene.inputRenderer.addController(inputPose.gripMatrix);
 
-mat4.translate(inputPose.gripMatrix, inputPose.gripMatrix, [0.3, 0, 1.75]);
-scene.inputRenderer.addController(inputPose.gripMatrix);
+mat4.translate(gripMatrix, inputPose.gripMatrix, [0.3, 0, 1.75]);
+scene.inputRenderer.addController(gripMatrix);
           }
 
           if (inputPose.targetRay) {
