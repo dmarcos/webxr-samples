@@ -147,9 +147,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
         initGL();
 
-        let mirrorCanvas = document.createElement('canvas');
-        let ctx = mirrorCanvas.getContext('xrpresent');
-        session.updateRenderState({ baseLayer: new XRWebGLLayer(session, gl), outputContext: ctx });
+        let inlineCanvas = document.createElement('canvas');
+        let inlineCtx = inlineCanvas.getContext('xrpresent');
+        document.body.appendChild(inlineCanvas);
+
+        session.updateRenderState({ baseLayer: new XRWebGLLayer(session, gl), outputContext: inlineCtx });
 
         // Get a stage frame of reference, which will align the user's physical
         // floor with Y=0 and can provide boundaries that indicate where the
