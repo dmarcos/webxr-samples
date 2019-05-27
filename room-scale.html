@@ -99,7 +99,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           let outputCanvas = document.createElement('canvas');
           let ctx = outputCanvas.getContext('xrpresent');
 
-          navigator.xr.requestSession("inline")
+          navigator.xr.requestSession({ mode: 'inline' })
               .then((session) => {
                 document.body.appendChild(outputCanvas);
                 onSessionStarted(session);
