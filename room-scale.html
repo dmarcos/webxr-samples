@@ -99,7 +99,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           let outputCanvas = document.createElement('canvas');
           let ctx = outputCanvas.getContext('xrpresent');
 
-          navigator.xr.requestSession({ outputContext: ctx })
+          navigator.xr.requestSession()
               .then((session) => {
                 document.body.appendChild(outputCanvas);
                 onSessionStarted(session);
@@ -123,7 +123,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         mirrorCanvas.setAttribute('id', 'mirror-canvas');
         document.body.appendChild(mirrorCanvas);
 
-        navigator.xr.requestSession({ mode: 'immersive-vr', outputContext: ctx }).then((session) => {
+        navigator.xr.requestSession({ mode: 'immersive-vr' }).then((session) => {
           xrButton.setSession(session);
           onSessionStarted(session);
         });
@@ -147,7 +147,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
         initGL();
 
-        session.updateRenderState({ baseLayer: new XRWebGLLayer(session, gl) });
+        session.updateRenderState({ baseLayer: new XRWebGLLayer(session, gl), outputContext: ctx });
 
         // Get a stage frame of reference, which will align the user's physical
         // floor with Y=0 and can provide boundaries that indicate where the
