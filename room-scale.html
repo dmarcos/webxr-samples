@@ -98,7 +98,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
           let inlineCanvas = document.createElement('canvas');
           let ctx = inlineCanvas.getContext('xrpresent');
-          inlineCanvas.setAttribute('id', 'inline-canvas');
 
           navigator.xr.requestSession({ mode: 'inline' })
               .then((session) => {
@@ -180,11 +179,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           // Remove the mirroring canvas.
           document.body.removeChild(document.querySelector('#mirror-canvas'));
           xrButton.setSession(null);
-        }
-        // Remove the inline session canvas.
-        let inlineCanvas = document.querySelector('#inline-canvas');
-        if (inlineCanvas) {
-          document.body.removeChild(document.querySelector('#inline-canvas'));
         }
       }
 
