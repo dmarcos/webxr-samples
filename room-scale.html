@@ -96,13 +96,14 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             xrButton.enabled = true;
           });
 
-          let outputCanvas = document.createElement('canvas');
-          let ctx = outputCanvas.getContext('xrpresent');
+          let inlineCanvas = document.createElement('canvas');
+          let ctx = inlineCanvas.getContext('xrpresent');
+          inlineCanvas.setAttribute('id', 'inline-canvas');
+          document.body.appendChild(inlineCanvas);
 
           navigator.xr.requestSession({ mode: 'inline' })
               .then((session) => {
-                document.body.appendChild(outputCanvas);
-                onSessionStarted(session);
+                onSessionStarted(session, ctx);
               });
         } else {
           initFallback();
@@ -125,7 +126,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
         navigator.xr.requestSession({ mode: 'immersive-vr' }).then((session) => {
           xrButton.setSession(session);
-          onSessionStarted(session);
+          onSessionStarted(session, ctx);
         });
       }
 
@@ -142,16 +143,12 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         scene.setRenderer(renderer);
       }
 
-      function onSessionStarted(session) {
+      function onSessionStarted(session, ctx) {
         session.addEventListener('end', onSessionEnded);
 
         initGL();
 
-        let inlineCanvas = document.createElement('canvas');
-        let inlineCtx = inlineCanvas.getContext('xrpresent');
-        document.body.appendChild(inlineCanvas);
-
-        session.updateRenderState({ baseLayer: new XRWebGLLayer(session, gl), outputContext: inlineCtx });
+        session.updateRenderState({ baseLayer: new XRWebGLLayer(session, gl), outputContext: ctx });
 
         // Get a stage frame of reference, which will align the user's physical
         // floor with Y=0 and can provide boundaries that indicate where the
@@ -178,9 +175,15 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       }
 
       function onSessionEnded(event) {
+        // Only reset the button when the immersive session ends.
         if (event.session.mode == "immersive-vr") {
+          // Remove the mirroring canvas.
           document.body.removeChild(document.querySelector('#mirror-canvas'));
           xrButton.setSession(null);
+        }
+        if (event.session.mode == "inline") {
+          // Remove the inline session canvas.
+          document.body.removeChild(document.querySelector('#inline-canvas'));
         }
       }
 
