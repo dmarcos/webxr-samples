@@ -99,10 +99,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           let inlineCanvas = document.createElement('canvas');
           let ctx = inlineCanvas.getContext('xrpresent');
           inlineCanvas.setAttribute('id', 'inline-canvas');
-          document.body.appendChild(inlineCanvas);
 
           navigator.xr.requestSession({ mode: 'inline' })
               .then((session) => {
+                document.body.appendChild(inlineCanvas);
                 onSessionStarted(session, ctx);
               });
         } else {
@@ -122,9 +122,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         let mirrorCanvas = document.createElement('canvas');
         let ctx = mirrorCanvas.getContext('xrpresent');
         mirrorCanvas.setAttribute('id', 'mirror-canvas');
-        document.body.appendChild(mirrorCanvas);
 
         navigator.xr.requestSession({ mode: 'immersive-vr' }).then((session) => {
+          document.body.appendChild(mirrorCanvas);
           xrButton.setSession(session);
           onSessionStarted(session, ctx);
         });
@@ -181,8 +181,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           document.body.removeChild(document.querySelector('#mirror-canvas'));
           xrButton.setSession(null);
         }
-        if (event.session.mode == "inline") {
-          // Remove the inline session canvas.
+        // Remove the inline session canvas.
+        let inlineCanvas = document.querySelector('#inline-canvas');
+        if (inlineCanvas) {
           document.body.removeChild(document.querySelector('#inline-canvas'));
         }
       }
