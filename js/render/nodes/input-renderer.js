@@ -259,7 +259,7 @@ export class InputRenderer extends Node {
 
     controller.matrix = gripMatrix;
     if (handedness == 'left') {
-      controller.matrix = mat4.scale(controller.matrix, [2, 1, 1]);
+      controller.matrix = mat4.scale(controller.matrix, controller.matrix, [2, 1, 1]);
     }
     controller.visible = true;
   }
