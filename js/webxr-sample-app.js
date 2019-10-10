@@ -33,7 +33,7 @@ export class WebXRSampleApp {
       immersiveMode: options.immersiveMode || 'immersive-vr',
       referenceSpace: options.referenceSpace || 'local',
       defaultInputHandling: 'defaultInputHandling' in options ? options.defaultInputHandling : true,
-      controllerMesh: options.controllerMesh
+      controllerMesh: options.controllerMesh,
       leftControllerMesh: options.leftControllerMesh
     };
 
