@@ -103,7 +103,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         onRendererInit() {
           super.onRendererInit();
 
-          this.scene.inputRenderer.setControllerMesh(new Gltf2Node({url: '../media/gltf/controller/controller.gltf'}));
+          this.scene.inputRenderer.setControllerMesh(new Gltf2Node({url: '../media/gltf/controller/controller.gltf'}), 'right');
+          this.scene.inputRenderer.setControllerMesh(new Gltf2Node({url: '../media/gltf/controller/controller-left.gltf'}), 'left');
         }
 
         onXRFrame(time, frame, refSpace) {
