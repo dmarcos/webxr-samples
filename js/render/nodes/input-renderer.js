@@ -22,6 +22,7 @@ import {Material, RENDER_ORDER} from '../core/material.js';
 import {Node} from '../core/node.js';
 import {Primitive, PrimitiveAttribute} from '../core/primitive.js';
 import {DataTexture} from '../core/texture.js';
+import {mat4} from '../math/gl-matrix.js';
 
 const GL = WebGLRenderingContext; // For enums
 
@@ -241,7 +242,7 @@ export class InputRenderer extends Node {
     this._controllerNodeHandedness = handedness;
   }
 
-  addController(gripMatrix) {
+  addController(gripMatrix, handedness = 'right') {
     if (!this._controllerNode) {
         return;
     }
@@ -257,6 +258,9 @@ export class InputRenderer extends Node {
     this._activeControllers = (this._activeControllers + 1) % this._maxInputElements;
 
     controller.matrix = gripMatrix;
+    if (handedness == 'left') {
+      controller.matrix = mat4.scale(controller.matrix, [2, 1, 1]);
+    }
     controller.visible = true;
   }
 
