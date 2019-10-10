@@ -259,7 +259,8 @@ export class InputRenderer extends Node {
 
     controller.matrix = gripMatrix;
     if (handedness == 'left') {
-      controller.matrix = mat4.scale(controller.matrix, controller.matrix, [2, 1, 1]);
+      // flip left controller to look real (since the model is right handed)
+      controller.matrix = mat4.scale(controller.matrix, controller.matrix, [-1, 1, 1]);
     }
     controller.visible = true;
   }
