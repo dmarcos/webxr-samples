@@ -212,8 +212,7 @@ export class InputRenderer extends Node {
     this._maxInputElements = 32;
 
     this._controllers = [];
-    this._controllerNode = null;
-    this._controllerNodeHandedness = null;
+    this._controllerNodes = null;
     this._lasers = null;
     this._cursors = null;
 
@@ -224,8 +223,7 @@ export class InputRenderer extends Node {
 
   onRendererChanged(renderer) {
     this._controllers = [];
-    this._controllerNode = null;
-    this._controllerNodeHandedness = null;
+    this._controllerNodes = null;
     this._lasers = null;
     this._cursors = null;
 
@@ -235,15 +233,18 @@ export class InputRenderer extends Node {
   }
 
   setControllerMesh(controllerNode, handedness = 'right') {
-    this._controllerNode = controllerNode;
-    this._controllerNode.visible = false;
+    if (!this._controllerNodes) {
+      this._controllerNodes = {};
+    }
+    this._controllerNodes[handedness] = controllerNode;
+    this._controllerNodes[handedness].visible = false;
     // FIXME: Temporary fix to initialize for cloning.
-    this.addNode(this._controllerNode);
-    this._controllerNodeHandedness = handedness;
+    this.addNode(this._controllerNodes[handedness]);
   }
 
   addController(gripMatrix, handedness = 'right') {
-    if (!this._controllerNode) {
+    let controllerNode = this._controllerNodes[handedness];
+    if (!controllerNode) {
         return;
     }
 
@@ -251,17 +252,13 @@ export class InputRenderer extends Node {
     if (this._activeControllers < this._controllers.length) {
       controller = this._controllers[this._activeControllers];
     } else {
-      controller = this._controllerNode.clone();
+      controller = controllerNode.clone();
       this.addNode(controller);
       this._controllers.push(controller);
     }
     this._activeControllers = (this._activeControllers + 1) % this._maxInputElements;
 
     controller.matrix = gripMatrix;
-    if (handedness == 'left') {
-      // flip left controller to look real (since the model is right handed)
-      controller.matrix = mat4.scale(controller.matrix, controller.matrix, [-1, 1, 1]);
-    }
     controller.visible = true;
   }
 
