@@ -256,7 +256,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
         let xrMode = appSettings.arMode ? 'immersive-ar' : 'immersive-vr';
         if (navigator.xr) {
-          navigator.xr.addEventListener('activate', onRequestSession);
+          navigator.xr.addEventListener('sessiongranted', onSessionGranted);
           navigator.xr.isSessionSupported(xrMode).then((supported) => {
             xrButton.enabled = supported;
           });
@@ -293,7 +293,12 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         scene.setRenderer(renderer);
       }
 
+      function onSessionGranted() {
+        console.log("onSessionGranted");
+        onRequestSession();
+      }
       function onRequestSession() {
+        console.log("onRequestSession");
         let xrMode = appSettings.arMode ? 'immersive-ar' : 'immersive-vr';
         return navigator.xr.requestSession(xrMode).then((session) => {
           xrButton.setSession(session);
