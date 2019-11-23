@@ -279,6 +279,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           document.body.appendChild(gl.canvas);
 
           function onResize() {
+            console.log("devicePixelRatio = " + window.devicePixelRatio + " w = " + gl.canvas.clientWidth + ", h = " + gl.canvas.clientHeight);
             gl.canvas.width = gl.canvas.clientWidth * window.devicePixelRatio;
             gl.canvas.height = gl.canvas.clientHeight * window.devicePixelRatio;
           }
