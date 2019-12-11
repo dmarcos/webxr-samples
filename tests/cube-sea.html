@@ -336,7 +336,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       }
 
       function onSessionEnded(event) {
-        event.session.end().then(function() { console.log("ended successfully"); }, function() { "already ended" });
+        event.session.end().then(function() { console.log("ended successfully"); }, 
+                                 function() { console.log("already ended") });
          
         xrButton.setSession(null);
       }
