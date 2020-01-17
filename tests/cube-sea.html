@@ -239,6 +239,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       let gl = null;
       let renderer = null;
       let scene = new Scene();
+      var paused = false;
       scene.addNode(cubeSea);
 
       function initXR() {
@@ -339,6 +340,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
       function onVisibilityChange(event) {
         console.log("Visibility change: " + event.session.visibilityState);
+        if (event.session.visibilityState == "visible") {
+          paused = false;
+        } else {
+          paused = true;
+        }
       }
 
       function onSessionEnded(event) {
@@ -360,7 +366,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
         frameNum++;
 
-        scene.startFrame();
+        if (!paused) 
+          scene.startFrame();
 
         if (appSettings.simulatedWorkTimeMs > 0) {
           // Simulate a heavy Javascript workload
@@ -389,11 +396,13 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
         scene.clear = !appSettings.arMode;
 
-        scene.updateInputSources(frame, refSpace);
+        if (!paused) 
+          scene.updateInputSources(frame, refSpace);
 
         scene.drawXRFrame(frame, pose);
 
-        scene.endFrame();
+        if (!paused) 
+          scene.endFrame();
       }
 
       // Start the XR application.
