@@ -313,6 +313,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         session.addEventListener('end', onSessionEnded);
         session.addEventListener('visibilitychange', onVisibilityChange);
 
+        session.addEventListener('selectstart', () => { console.log("selectstart"); });
+        session.addEventListener('select', () => { console.log("select"); });
+        session.addEventListener('selectend', () => { console.log("selectend"); });
 
         initGL();
         scene.inputRenderer.useProfileControllerMeshes(session);
