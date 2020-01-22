@@ -61,6 +61,22 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       // WebGL scene globals.
       let gl = null;
 
+      var fragmentShader;
+      var program;
+
+      var vertexPositionLocation;
+      var vertexColorLocation;
+      var vertexTransformLocation;
+
+      var simulation = new Object;
+      simulation.CurrentRotation = vec3.create();
+
+      var scene;
+      var projMatrix = mat4.create();
+      var viewMatrix = mat4.create();
+      var eyePosition = vec3.fromValues(1, 1, 1);
+      var viewProjMatrix = mat4.create();
+
       // Checks to see if WebXR is available and, if so, requests an XRDevice
       // that is connected to the system and tests it to ensure it supports the
       // desired session options.
@@ -155,22 +171,18 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         var vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource);
         console.log(fragmentShaderSource);
         var fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource);
-        var program = createProgram(gl, vertexShader, fragmentShader);
+        program = createProgram(gl, vertexShader, fragmentShader);
 
-        var vertexPositionLocation = gl.getAttribLocation(program, "vertexPosition");
-        var vertexColorLocation = gl.getAttribLocation(program, "vertexColor");
-        var vertexTransformLocation = gl.getAttribLocation(program, "vertexTransform");
+        vertexPositionLocation = gl.getAttribLocation(program, "vertexPosition");
+        vertexColorLocation = gl.getAttribLocation(program, "vertexColor");
+        vertexTransformLocation = gl.getAttribLocation(program, "vertexTransform");
 
-        var simulation = new Object;
-        simulation.CurrentRotation = vec3.create();
-
-        var scene = createScene(gl);
-        var projMatrix = mat4.create();
+        scene = createScene(gl);
+        
         mat4.perspective(projMatrix, Math.PI / 2, gl.drawingBufferWidth / gl.drawingBufferHeight, 0.1, 10000.0);
-        var viewMatrix = mat4.create();
-        var eyePosition = vec3.fromValues(1, 1, 1);
+        
         mat4.lookAt(viewMatrix, eyePosition, vec3.fromValues(0, 0, 0), vec3.fromValues(0, 1, 0));
-        var viewProjMatrix = mat4.create();
+
         mat4.multiply(viewProjMatrix, projMatrix, viewMatrix);
 
 
