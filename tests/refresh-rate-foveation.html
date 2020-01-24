@@ -309,7 +309,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         console.log("onRequestSession");
         let xrMode = appSettings.arMode ? 'immersive-ar' : 'immersive-vr';
         return navigator.xr.requestSession('immersive-vr', {
-            optionalFeatures: ['low-refresh-rate', 'high-fixed-foveation-level'] 
+            optionalFeatures: ['low-refresh-rate', 'high-fixed-foveation-level', 'ca-correction'] 
         }).then((session) => {
           xrButton.setSession(session);
           session.isImmersive = true;
