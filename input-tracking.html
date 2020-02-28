@@ -135,7 +135,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         initGL();
 
         let glLayer = new XRWebGLLayer(session, gl);
-        session.updateRenderState({ layers: [glLayer] });
+        if (session.isImmersive) {
+          session.updateRenderState({ layers: [glLayer] });
+        } else {
+          session.updateRenderState({ baseLayer: glLayer });
+        }
 
         let refSpaceType = session.isImmersive ? 'local-floor' : 'viewer';
         session.requestReferenceSpace(refSpaceType).then((refSpace) => {
