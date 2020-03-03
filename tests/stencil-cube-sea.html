@@ -36,10 +36,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
   <body>
     <header>
       <details id='details-panel' open>
-        <summary>Cube Sea</summary>
+        <summary>Stencil</summary>
         <p>
-          All hail the cube sea! It's not very interesting to look at, but it's
-          fantastic for testing!
+          Test stencil
           <a class="back" href="./">Back</a>
         </p>
       </details>
@@ -533,6 +532,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         );
 
         for (let view of pose.views) {
+          gl.clearColor(1, 1, 1, 1.0);
+
           let xrViewport = glLayer.getViewport(view);
           if (xrViewport) {
             let vp = xrViewport;
@@ -566,7 +567,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
              gl.REPLACE,  // what to do if both tests pass
           );
 
-          mat4.fromScaling(m4, [0.2, 0.8, 1]);
+          mat4.fromScaling(m4, [0.2, 0.4, 1]);
           //mat4.translate(m4, m4, [1,1,0]);
           // draw a white small triangle
           gl.uniform4fv(colorLoc, [1, 1, 1, 1]); // white
@@ -595,6 +596,51 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           gl.uniform4fv(colorLoc, [0, 1, 0, 1]); // green
           gl.uniformMatrix4fv(matLoc, false, m4);
           gl.drawArrays(gl.TRIANGLES, 0, 3);
+
+          gl.flush();
+          gl.finish();
+          let pixels = new Uint8Array(4);
+
+          // check that the main color is used coorectly (green)
+          pixels[0] = pixels[1] = pixels[2] = pixels[3] = 0;
+          gl.readPixels(xrViewport.x + xrViewport.width / 2, xrViewport.y + xrViewport.height/4, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
+          if (pixels[0] == 0x0 && pixels[1] == 0xFF && pixels[2] == 0x0) { // green?
+            console.log("PASSED1");
+          } else {
+            if (pixels[0] == 0xFF && pixels[1] == 0xFF && pixels[2] == 0xFF) { // white?
+              console.log("FAILED1");
+            } else {
+              console.log("Readpixels is not working: " + gl.getError());
+            }
+            // draw red square to indicate failed test
+            gl.enable( gl.SCISSOR_TEST );
+            gl.clearColor(1, 0, 0, 1);
+            gl.scissor(xrViewport.x + xrViewport.width / 2 - 70, xrViewport.y + xrViewport.height/2 - 70, 140, 140);
+            gl.clear(gl.COLOR_BUFFER_BIT);
+            gl.disable( gl.SCISSOR_TEST );
+          }
+
+          
+          // check if stencil worked, i.e. white pixels in the center
+          pixels[0] = pixels[1] = pixels[2] = pixels[3] = 0;
+          gl.readPixels(xrViewport.x + xrViewport.width / 2, xrViewport.y + xrViewport.height/2, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
+          if (pixels[0] == 0xFF && pixels[1] == 0xFF && pixels[2] == 0xFF) { // white?
+            console.log("PASSED2");
+          } else {
+            if (pixels[0] == 0x0 && pixels[1] == 0xFF && pixels[2] == 0x0) { // green?
+              console.log("FAILED2");
+              // draw magenta square to indicate failed test
+              gl.clearColor(1, 0, 1, 1);
+            } else {
+              console.log("Readpixels is not working: " + gl.getError());
+              // draw black square to indicate failed test
+              gl.clearColor(0, 0, 0, 1);
+            }
+            gl.enable( gl.SCISSOR_TEST );
+            gl.scissor(xrViewport.x + xrViewport.width / 2 - 50, xrViewport.y + xrViewport.height/2 - 50, 100, 100);
+            gl.clear(gl.COLOR_BUFFER_BIT);
+            gl.disable( gl.SCISSOR_TEST );
+          }
         }
         if (!paused) 
           scene.endFrame();
