@@ -162,8 +162,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           //const height = layer1.framebufferHeight;
           gl.enable(gl.SCISSOR_TEST);
           gl.scissor(width / 4, height / 2, width / 2, height / 4);
-          let time = Date.now();
-          gl.clearColor(Math.cos(time / 2000), Math.cos(time / 4000), Math.cos(time / 6000), 0.5);
+          let time1 = Date.now();
+          gl.clearColor(Math.cos(time1 / 2000), Math.cos(time1 / 4000), Math.cos(time1 / 6000), 0.5);
           gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
         }
       }
