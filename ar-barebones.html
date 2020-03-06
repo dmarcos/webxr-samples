@@ -158,8 +158,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           // Update the clear color so that we can observe the color in the
           // headset changing over time. Use a scissor rectangle to keep the AR
           // scene visible.
-          const width = layer1.framebufferWidth;
-          const height = layer1.framebufferHeight;
+          //const width = layer1.framebufferWidth;
+          //const height = layer1.framebufferHeight;
           gl.enable(gl.SCISSOR_TEST);
           gl.scissor(width / 4, height / 2, width / 2, height / 4);
           let time = Date.now();
