@@ -60,7 +60,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       let gl = null;
 
       function checkSupportedState() {
-        navigator.xr.isSessionSupported('immersive-ar').then((supported) => {
+        navigator.xr.isSessionSupported('immersive-vr').then((supported) => {
           if (supported) {
             xrButton.innerHTML = 'Enter AR';
           } else {
@@ -88,7 +88,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         if (!xrSession) {
             // Ask for an optional DOM Overlay, see https://immersive-web.github.io/dom-overlays/
             // Use BODY as the root element.
-            navigator.xr.requestSession('immersive-ar', {
+            navigator.xr.requestSession('immersive-vr', {
                 optionalFeatures: ['dom-overlay'],
                 domOverlay: {root: document.body}
             }).then(onSessionStarted, onRequestSessionError);
