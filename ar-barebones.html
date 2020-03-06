@@ -138,13 +138,14 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         let pose = frame.getViewerPose(xrRefSpace);
 
         if (pose) {
-          gl.bindFramebuffer(gl.FRAMEBUFFER, session.renderState.layers[0].framebuffer);
+          let layer0 = session.renderState.layers[0];
+          gl.bindFramebuffer(gl.FRAMEBUFFER, layer0.framebuffer);
 
           // Update the clear color so that we can observe the color in the
           // headset changing over time. Use a scissor rectangle to keep the AR
           // scene visible.
-          const width = session.renderState.baseLayer.framebufferWidth;
-          const height = session.renderState.baseLayer.framebufferHeight;
+          const width = layer0.framebufferWidth;
+          const height = layer0.framebufferHeight;
           gl.enable(gl.SCISSOR_TEST);
           gl.scissor(width / 4, height / 4, width / 2, height / 2);
           let time = Date.now();
