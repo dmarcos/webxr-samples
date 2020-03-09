@@ -105,7 +105,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         let canvas = document.createElement('canvas');
         gl = canvas.getContext('webgl', { xrCompatible: true });
         xrGLFactory = new XRWebGLLayerFactory(session, gl);
-        xrGLFactory.requestProjectionLayer(gl.TEXTURE_2D_ARRAY).then((layer) => {
+        xrGLFactory.requestProjectionLayer(gl.TEXTURE_2D_ARRAY, {}).then((layer) => {
           // Use the new WebGL context to create a XRWebGLLayer and set it as the
           // sessions baseLayer. This allows any content rendered to the layer to
           // be displayed on the XRDevice.
