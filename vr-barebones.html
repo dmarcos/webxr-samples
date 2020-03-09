@@ -56,6 +56,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       let xrButton = document.getElementById('xr-button');
       let xrSession = null;
       let xrRefSpace = null;
+      let xrGLFactory = null;
 
       // WebGL scene globals.
       let gl = null;
@@ -103,20 +104,22 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         // with the XRDisplay we're presenting to.
         let canvas = document.createElement('canvas');
         gl = canvas.getContext('webgl', { xrCompatible: true });
+        xrGLFactory = new XRWebGLLayerFactory(session, gl);
+        xrGLFactory.requestProjectionLayer(gl.TEXTURE_2D_ARRAY).then((layer) {
+          // Use the new WebGL context to create a XRWebGLLayer and set it as the
+          // sessions baseLayer. This allows any content rendered to the layer to
+          // be displayed on the XRDevice.
+          session.updateRenderState({ layers: [ layer ]) });
 
-        // Use the new WebGL context to create a XRWebGLLayer and set it as the
-        // sessions baseLayer. This allows any content rendered to the layer to
-        // be displayed on the XRDevice.
-        session.updateRenderState({ baseLayer: new XRWebGLLayer(session, gl) });
+          // Get a reference space, which is required for querying poses. In this
+          // case an 'local' reference space means that all poses will be relative
+          // to the location where the XRDevice was first detected.
+          session.requestReferenceSpace('local').then((refSpace) => {
+            xrRefSpace = refSpace;
 
-        // Get a reference space, which is required for querying poses. In this
-        // case an 'local' reference space means that all poses will be relative
-        // to the location where the XRDevice was first detected.
-        session.requestReferenceSpace('local').then((refSpace) => {
-          xrRefSpace = refSpace;
-
-          // Inform the session that we're ready to begin drawing.
-          session.requestAnimationFrame(onXRFrame);
+            // Inform the session that we're ready to begin drawing.
+            session.requestAnimationFrame(onXRFrame);
+          });
         });
       }
 
