@@ -154,11 +154,13 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         // disappear.
         if (pose) {
           let glLayer = session.renderState.layers[0];
+          
+          let subimage = xrGLFactory.getViewSubImage(glLayer, pose.views[0]);
 
           // If we do have a valid pose, bind the WebGL layer's framebuffer,
           // which is where any content to be displayed on the XRDevice must be
           // rendered.
-          gl.bindFramebuffer(gl.FRAMEBUFFER, glLayer.framebuffer);
+          gl.bindFramebuffer(gl.FRAMEBUFFER, subimage.framebuffer);
 
           // Update the clear color so that we can observe the color in the
           // headset changing over time.
