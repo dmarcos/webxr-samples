@@ -153,7 +153,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         // framebuffer cleared, so tracking loss means the scene will simply
         // disappear.
         if (pose) {
-          let glLayer = session.renderState.layer[0];
+          let glLayer = session.renderState.layers[0];
 
           // If we do have a valid pose, bind the WebGL layer's framebuffer,
           // which is where any content to be displayed on the XRDevice must be
