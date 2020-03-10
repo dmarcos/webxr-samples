@@ -156,7 +156,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           let glLayer = session.renderState.layers[0];
           
           console.log("XR getViewSubImage");
-          let subimage = xrGLFactory.XR getViewSubImage(glLayer, pose.views[0]);
+          let subimage = xrGLFactory.getViewSubImage(glLayer, pose.views[0]);
 
           // If we do have a valid pose, bind the WebGL layer's framebuffer,
           // which is where any content to be displayed on the XRDevice must be
