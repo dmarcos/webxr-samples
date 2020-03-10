@@ -155,11 +155,13 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         if (pose) {
           let glLayer = session.renderState.layers[0];
           
-          let subimage = xrGLFactory.getViewSubImage(glLayer, pose.views[0]);
+          console.log("XR getViewSubImage");
+          let subimage = xrGLFactory.XR getViewSubImage(glLayer, pose.views[0]);
 
           // If we do have a valid pose, bind the WebGL layer's framebuffer,
           // which is where any content to be displayed on the XRDevice must be
           // rendered.
+          console.log("XR bindFramebuffer");
           gl.bindFramebuffer(gl.FRAMEBUFFER, subimage.framebuffer);
 
           // Update the clear color so that we can observe the color in the
@@ -169,7 +171,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
                         Math.cos(time / 6000), 1.0);
 
           // Clear the framebuffer
+          console.log("XR clear");
           gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+          
+          console.log("XR done");
 
           // Normally you'd loop through each of the views reported by the frame
           // and draw them into the corresponding viewport here, but we're
