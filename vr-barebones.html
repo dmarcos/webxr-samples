@@ -36,13 +36,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       <details open>
         <summary>Barebones VR</summary>
         <p>
-          This sample demonstrates extremely simple use of an "immersive-vr"
-          session with no library dependencies. It doesn't render anything
-          exciting, just clears your headset's display to a slowly changing
-          color to prove it's working.
+          This sample uses one or more projection layers
           <a class="back" href="./">Back</a>
         </p>
         <button id="xr-button" disabled>XR not found</button>
+        <button id="xr-button2" disabled>XR not found</button>
       </details>
     </header>
     <main style='text-align: center;'>
@@ -54,12 +52,14 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
       // XR globals.
       let xrButton = document.getElementById('xr-button');
+      let xrButton2 = document.getElementById('xr-button');
       let xrSession = null;
       let xrRefSpace = null;
       let xrGLFactory = null;
 
       // WebGL scene globals.
       let gl = null;
+      let single_layer = true;
 
       // Checks to see if WebXR is available and, if so, requests an XRDevice
       // that is connected to the system and tests it to ensure it supports the
@@ -73,8 +73,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             if (supported) {
               // Updates the button to start an XR session when clicked.
               xrButton.addEventListener('click', onButtonClicked);
-              xrButton.textContent = 'Enter VR';
+              xrButton.textContent = 'Show single layer';
               xrButton.disabled = false;
+              xrButton2.addEventListener('click', onButtonClicked2);
+              xrButton2.textContent = 'Show 2 layers';
+              xrButton2.disabled = false;
             }
           });
         }
@@ -89,7 +92,15 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           xrSession.end();
         }
       }
-
+        
+      function onButtonClicked2() {
+        if (!xrSession) {
+          single_layer = false;
+          navigator.xr.requestSession('immersive-vr').then(onSessionStarted);
+        } else {
+          xrSession.end();
+        }
+      }
       // Called when we've successfully acquired a XRSession. In response we
       // will set up the necessary session state and kick off the frame loop.
       function onSessionStarted(session) {
@@ -106,20 +117,26 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         gl = canvas.getContext('webgl', { xrCompatible: true });
         xrGLFactory = new XRWebGLLayerFactory(session, gl);
         xrGLFactory.requestProjectionLayer(gl.TEXTURE_2D_ARRAY, {}).then((layer) => {
-          // Use the new WebGL context to create a XRWebGLLayer and set it as the
-          // sessions baseLayer. This allows any content rendered to the layer to
-          // be displayed on the XRDevice.
-          session.updateRenderState({ layers: [ layer ] });
+          if (single_layer) {
+            session.updateRenderState({ layers: [ layer ] });
 
-          // Get a reference space, which is required for querying poses. In this
-          // case an 'local' reference space means that all poses will be relative
-          // to the location where the XRDevice was first detected.
-          session.requestReferenceSpace('local').then((refSpace) => {
-            xrRefSpace = refSpace;
+            session.requestReferenceSpace('local').then((refSpace) => {
+              xrRefSpace = refSpace;
 
-            // Inform the session that we're ready to begin drawing.
-            session.requestAnimationFrame(onXRFrame);
-          });
+              // Inform the session that we're ready to begin drawing.
+              session.requestAnimationFrame(onXRFrame);
+            });
+          } else {
+            xrGLFactory.requestProjectionLayer(gl.TEXTURE_2D_ARRAY, {}).then((layer2) => {
+              session.updateRenderState({ layers: [ layer, layer2 ] });
+              session.requestReferenceSpace('local').then((refSpace) => {
+                xrRefSpace = refSpace;
+
+                // Inform the session that we're ready to begin drawing.
+                session.requestAnimationFrame(onXRFrame);
+              });
+            });
+          }
         });
       }
 
@@ -153,42 +170,14 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         // framebuffer cleared, so tracking loss means the scene will simply
         // disappear.
         if (pose) {
-          let glLayer = session.renderState.layers[0];
-          
-          console.log("XR getViewSubImage");
-          let subimage = xrGLFactory.getViewSubImage(glLayer, pose.views[0]);
-
-          // If we do have a valid pose, bind the WebGL layer's framebuffer,
-          // which is where any content to be displayed on the XRDevice must be
-          // rendered.
-          console.log("XR bindFramebuffer");
-          gl.bindFramebuffer(gl.FRAMEBUFFER, subimage.framebuffer);
-
-          // Update the clear color so that we can observe the color in the
-          // headset changing over time.
-          gl.clearColor(Math.cos(time / 2000),
-                        Math.cos(time / 4000),
-                        Math.cos(time / 6000), 1.0);
-
-          // Clear the framebuffer
-          console.log("XR clear");
-          gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-          
-          console.log("XR done");
-
-          // Normally you'd loop through each of the views reported by the frame
-          // and draw them into the corresponding viewport here, but we're
-          // keeping this sample slim so we're not bothering to draw any
-          // geometry.
-          /*for (let view of pose.views) {
-            let viewport = glLayer.getViewport(view);
-            gl.viewport(viewport.x, viewport.y,
-                        viewport.width, viewport.height);
-
-            // Draw a scene using view.projectionMatrix as the projection matrix
-            // and view.transform to position the virtual camera. If you need a
-            // view matrix, use view.transform.inverse.matrix.
-          }*/
+          session.renderState.layers.forEach(function(glLayer) {    
+            let subimage = xrGLFactory.getViewSubImage(glLayer, pose.views[0]);
+            gl.bindFramebuffer(gl.FRAMEBUFFER, subimage.framebuffer);
+            gl.clearColor(Math.cos(time / 2000),
+                          Math.cos(time / 4000),
+                          Math.cos(time / 6000), 1.0);
+            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+           });
         }
       }
 
