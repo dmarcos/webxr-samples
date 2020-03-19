@@ -174,8 +174,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           let cnt = 0;
           let arraylength = session.renderState.layers.length;
           session.renderState.layers.forEach(function(glLayer) {   
-            const width = layer0.framebufferWidth;
-            const height = layer0.framebufferHeight;
+            const width = glLayer.framebufferWidth;
+            const height = glLayer.framebufferHeight;
             let subimage = xrGLFactory.getViewSubImage(glLayer, pose.views[0]);
             gl.bindFramebuffer(gl.FRAMEBUFFER, subimage.framebuffer);
             gl.enable(gl.SCISSOR_TEST);
