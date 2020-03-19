@@ -87,6 +87,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       // session we'll request one, and if we do have a session we'll end it.
       function onButtonClicked() {
         if (!xrSession) {
+          single_layer = true;
           navigator.xr.requestSession('immersive-vr').then(onSessionStarted);
         } else {
           xrSession.end();
