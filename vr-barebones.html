@@ -180,11 +180,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             gl.bindFramebuffer(gl.FRAMEBUFFER, subimage.framebuffer);
             gl.enable(gl.SCISSOR_TEST);
             gl.scissor(0, height/arraylength*cnt, width, height/arraylength);
-            gl.clearColor(Math.cos(time / 2000),
-                          Math.cos(time / 4000),
-                          Math.cos(time / 6000), 1.0);
-            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
             cnt++;
+            gl.clearColor(Math.cos(cnt * time / 2000),
+                          Math.cos(cnt * time / 4000),
+                          Math.cos(cnt * time / 6000), 1.0);
+            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
            });
         }
       }
