@@ -170,13 +170,20 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         // framebuffer cleared, so tracking loss means the scene will simply
         // disappear.
         if (pose) {
-          session.renderState.layers.forEach(function(glLayer) {    
+          let cnt = 0;
+          let arraylength = session.renderState.layers.length;
+          session.renderState.layers.forEach(function(glLayer) {   
+            const width = layer0.framebufferWidth;
+            const height = layer0.framebufferHeight;
             let subimage = xrGLFactory.getViewSubImage(glLayer, pose.views[0]);
             gl.bindFramebuffer(gl.FRAMEBUFFER, subimage.framebuffer);
+            gl.enable(gl.SCISSOR_TEST);
+            gl.scissor(0, height/arraylength*cnt, width, height/arraylength);
             gl.clearColor(Math.cos(time / 2000),
                           Math.cos(time / 4000),
                           Math.cos(time / 6000), 1.0);
             gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+            cnt++;
            });
         }
       }
