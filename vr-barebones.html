@@ -43,6 +43,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         <button id="xr-button" disabled>XR not found</button>
         <button id="xr-button2" disabled>XR not found</button>
         <button id="xr-button3" disabled>XR not found</button>
+        <input type="checkbox" id="stereo_layer" value="Bike">stereo cylinder layer</input>
       </details>
     </header>
     <main style='text-align: center;'>
@@ -64,6 +65,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       let gl = null;
       let single_layer = true;
       let cylinder_layer = false;
+      let stereo_layer = true;
 
       // Checks to see if WebXR is available and, if so, requests an XRDevice
       // that is connected to the system and tests it to ensure it supports the
@@ -82,7 +84,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
               xrButton2.addEventListener('click', onButtonClicked2);
               xrButton2.textContent = 'Show 2 layers';
               xrButton2.disabled = false;
-              xrButton3.addEventListener('click', onButtonClicked);
+              xrButton3.addEventListener('click', onButtonClicked3);
               xrButton3.textContent = 'Show single cylinder layer';
               xrButton3.disabled = false;
             }
@@ -112,10 +114,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         }
       }
         
-      function onButtonClicked() {
+      function onButtonClicked3() {
         if (!xrSession) {
           single_layer = true;
           cylinder_layer = true;
+          stereo_layer = true;
           navigator.xr.requestSession('immersive-vr').then(onSessionStarted);
         } else {
           xrSession.end();
@@ -160,7 +163,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             }
           });
         } else {
-           xrGLFactory.requestCylinderLayer(gl.TEXTURE_2D_ARRAY, {pixelWidth: 200, pixelHeight: 100, stereo: true}).then((layer) => {
+           xrGLFactory.requestCylinderLayer(gl.TEXTURE_2D_ARRAY, {pixelWidth: 200, pixelHeight: 100, stereo: stereo_layer}).then((layer) => {
             if (single_layer) {
               session.updateRenderState({ layers: [ layer ] });
 
@@ -171,7 +174,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
                 session.requestAnimationFrame(onXRFrame);
               });
             } else {
-              xrGLFactory.requestCylinderLayer(gl.TEXTURE_2D_ARRAY, {pixelWidth: 200, pixelHeight: 100, stereo: true}).then((layer2) => {
+              xrGLFactory.requestCylinderLayer(gl.TEXTURE_2D_ARRAY, {pixelWidth: 200, pixelHeight: 100, stereo: stereo_layer}).then((layer2) => {
                 layer2.radius = 2;
                 layer2.centralAngle = 180;
                 session.updateRenderState({ layers: [ layer, layer2 ] });
