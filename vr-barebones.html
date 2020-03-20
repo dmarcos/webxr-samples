@@ -37,10 +37,12 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         <summary>Barebones VR</summary>
         <p>
           This sample uses one or more projection layers
+          or one or more cylinder layers
           <a class="back" href="./">Back</a>
         </p>
         <button id="xr-button" disabled>XR not found</button>
         <button id="xr-button2" disabled>XR not found</button>
+        <button id="xr-button3" disabled>XR not found</button>
       </details>
     </header>
     <main style='text-align: center;'>
@@ -53,6 +55,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       // XR globals.
       let xrButton = document.getElementById('xr-button');
       let xrButton2 = document.getElementById('xr-button2');
+      let xrButton3 = document.getElementById('xr-button3');
       let xrSession = null;
       let xrRefSpace = null;
       let xrGLFactory = null;
@@ -60,6 +63,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       // WebGL scene globals.
       let gl = null;
       let single_layer = true;
+      let cylinder_layer = false;
 
       // Checks to see if WebXR is available and, if so, requests an XRDevice
       // that is connected to the system and tests it to ensure it supports the
@@ -78,6 +82,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
               xrButton2.addEventListener('click', onButtonClicked2);
               xrButton2.textContent = 'Show 2 layers';
               xrButton2.disabled = false;
+              xrButton3.addEventListener('click', onButtonClicked);
+              xrButton3.textContent = 'Show single cylinder layer';
+              xrButton3.disabled = false;
             }
           });
         }
@@ -88,6 +95,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       function onButtonClicked() {
         if (!xrSession) {
           single_layer = true;
+          cylinder_layer = false;
           navigator.xr.requestSession('immersive-vr').then(onSessionStarted);
         } else {
           xrSession.end();
@@ -97,6 +105,17 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       function onButtonClicked2() {
         if (!xrSession) {
           single_layer = false;
+          cylinder_layer = false;
+          navigator.xr.requestSession('immersive-vr').then(onSessionStarted);
+        } else {
+          xrSession.end();
+        }
+      }
+        
+      function onButtonClicked() {
+        if (!xrSession) {
+          single_layer = true;
+          cylinder_layer = true;
           navigator.xr.requestSession('immersive-vr').then(onSessionStarted);
         } else {
           xrSession.end();
@@ -117,28 +136,52 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         let canvas = document.createElement('canvas');
         gl = canvas.getContext('webgl', { xrCompatible: true });
         xrGLFactory = new XRWebGLLayerFactory(session, gl);
-        xrGLFactory.requestProjectionLayer(gl.TEXTURE_2D_ARRAY, {}).then((layer) => {
-          if (single_layer) {
-            session.updateRenderState({ layers: [ layer ] });
+        if(!cylinder_layer) {
+          xrGLFactory.requestProjectionLayer(gl.TEXTURE_2D_ARRAY, {}).then((layer) => {
+            if (single_layer) {
+              session.updateRenderState({ layers: [ layer ] });
 
-            session.requestReferenceSpace('local').then((refSpace) => {
-              xrRefSpace = refSpace;
-
-              // Inform the session that we're ready to begin drawing.
-              session.requestAnimationFrame(onXRFrame);
-            });
-          } else {
-            xrGLFactory.requestProjectionLayer(gl.TEXTURE_2D_ARRAY, {}).then((layer2) => {
-              session.updateRenderState({ layers: [ layer, layer2 ] });
               session.requestReferenceSpace('local').then((refSpace) => {
                 xrRefSpace = refSpace;
 
                 // Inform the session that we're ready to begin drawing.
                 session.requestAnimationFrame(onXRFrame);
               });
-            });
-          }
-        });
+            } else {
+              xrGLFactory.requestProjectionLayer(gl.TEXTURE_2D_ARRAY, {}).then((layer2) => {
+                session.updateRenderState({ layers: [ layer, layer2 ] });
+                session.requestReferenceSpace('local').then((refSpace) => {
+                  xrRefSpace = refSpace;
+
+                  // Inform the session that we're ready to begin drawing.
+                  session.requestAnimationFrame(onXRFrame);
+                });
+              });
+            }
+          });
+        } else {
+           xrGLFactory.requestCylinderLayer(gl.TEXTURE_2D_ARRAY, {}).then((layer) => {
+            if (single_layer) {
+              session.updateRenderState({ layers: [ layer ] });
+
+              session.requestReferenceSpace('local').then((refSpace) => {
+                xrRefSpace = refSpace;
+
+                // Inform the session that we're ready to begin drawing.
+                session.requestAnimationFrame(onXRFrame);
+              });
+            } else {
+              xrGLFactory.requestCylinderLayer(gl.TEXTURE_2D_ARRAY, {}).then((layer2) => {
+                session.updateRenderState({ layers: [ layer, layer2 ] });
+                session.requestReferenceSpace('local').then((refSpace) => {
+                  xrRefSpace = refSpace;
+
+                  // Inform the session that we're ready to begin drawing.
+                  session.requestAnimationFrame(onXRFrame);
+                });
+              });
+            }
+          });         
       }
 
       // Called either when the user has explicitly ended the session by calling
