@@ -118,7 +118,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         if (!xrSession) {
           single_layer = true;
           cylinder_layer = true;
-          stereo_layer = true;
           navigator.xr.requestSession('immersive-vr').then(onSessionStarted);
         } else {
           xrSession.end();
