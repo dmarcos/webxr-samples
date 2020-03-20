@@ -222,7 +222,12 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           session.renderState.layers.forEach(function(glLayer) {   
             const width = glLayer.pixelWidth;
             const height = glLayer.pixelHeight;
-            let subimage = xrGLFactory.getViewSubImage(glLayer, pose.views[0]);
+            let subimage = null;
+            if ((glLayer.stereo === undefined) || glLayer.stereo) {
+              subimage = xrGLFactory.getViewSubImage(glLayer, pose.views[0]);
+            } else {
+              subimage = xrGLFactory.getViewSubImage(glLayer);
+            }
             gl.bindFramebuffer(gl.FRAMEBUFFER, subimage.framebuffer);
             gl.enable(gl.SCISSOR_TEST);
             gl.scissor(0, height/arraylength*cnt, width, height/arraylength);
