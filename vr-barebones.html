@@ -65,7 +65,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       let gl = null;
       let single_layer = true;
       let cylinder_layer = false;
-      //let stereo_layer = true;
+      let stereo_layer = document.getElementById("stereo_layer");
 
       // Checks to see if WebXR is available and, if so, requests an XRDevice
       // that is connected to the system and tests it to ensure it supports the
@@ -163,7 +163,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             }
           });
         } else {
-           xrGLFactory.requestCylinderLayer(gl.TEXTURE_2D_ARRAY, {pixelWidth: 200, pixelHeight: 100, stereo: stereo_layer}).then((layer) => {
+           xrGLFactory.requestCylinderLayer(gl.TEXTURE_2D_ARRAY, {pixelWidth: 200, pixelHeight: 100, stereo: stereo_layer.checked}).then((layer) => {
             if (single_layer) {
               session.updateRenderState({ layers: [ layer ] });
 
@@ -174,7 +174,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
                 session.requestAnimationFrame(onXRFrame);
               });
             } else {
-              xrGLFactory.requestCylinderLayer(gl.TEXTURE_2D_ARRAY, {pixelWidth: 200, pixelHeight: 100, stereo: stereo_layer}).then((layer2) => {
+              xrGLFactory.requestCylinderLayer(gl.TEXTURE_2D_ARRAY, {pixelWidth: 200, pixelHeight: 100, stereo: stereo_layer.checked}).then((layer2) => {
                 layer2.radius = 2;
                 layer2.centralAngle = 180;
                 session.updateRenderState({ layers: [ layer, layer2 ] });
