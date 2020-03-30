@@ -180,7 +180,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         if (pose) {
           console.log("XR bindFramebuffer");
           let glLayer = null;
-          let glLayer = null;
 
           if (session.isImmersive) {
             gl.bindFramebuffer(gl.FRAMEBUFFER, xrFramebuffer);
@@ -243,7 +242,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
               glLayer.framebuffer = xrFramebuffer;
               viewport = glLayer.viewport;          
             } else {
-              viewport = glLayer.getViewport(view)
+              viewport = glLayer.getViewport(view);
             }
             // Gather all the values needed for one view and push it into the
             // array of views to be drawn. WebXRView is a utility class that
