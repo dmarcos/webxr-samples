@@ -237,7 +237,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
           let views = [];
           for (let view of pose.views) {
-            let viewport = nullptr;
+            let viewport = null;
             if (session.isImmersive) {
               glProjLayer = xrGLFactory.getViewSubImage(session.renderState.layers[0], view);
               glProjLayer.framebuffer = xrFramebuffer;
