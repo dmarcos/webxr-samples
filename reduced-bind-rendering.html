@@ -136,7 +136,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         if (session.isImmersive) {
           xrFramebuffer = gl.createFramebuffer();
           xrGLFactory = new XRWebGLLayerFactory(session, gl);
-          let layer = await xrGLFactory.requestProjectionLayer(gl.TEXTURE_2D_ARRAY, {});
+          let layer = await xrGLFactory.requestProjectionLayer(gl.TEXTURE_2D, {});
           session.updateRenderState({ layers: [ layer ] });
         } else {
           let glLayer = new XRWebGLLayer(session, gl);
