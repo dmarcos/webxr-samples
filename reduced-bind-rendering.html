@@ -240,7 +240,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             if (session.isImmersive) {
               glLayer = xrGLFactory.getViewSubImage(session.renderState.layers[0], view);
               glLayer.framebuffer = xrFramebuffer;
-              viewport = glLayer.viewport;          
+              viewport = glLayer.viewport;
+              gl.bindFramebuffer(gl.FRAMEBUFFER, xrFramebuffer);
+              gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, glLayer.colorTexture, 0);      
             } else {
               viewport = glLayer.getViewport(view);
             }
