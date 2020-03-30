@@ -245,7 +245,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
               gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, glLayer.colorTexture, 0);
 
               if (glLayer.depthStencilTexture === undefined) {
-                if (xrDepthBuffer === undefined) {
+                if (xrDepthBuffer === null) {
                   xrDepthBuffer = gl.createRenderbuffer();
                   gl.bindRenderbuffer(gl.RENDERBUFFER, xrDepthBuffer);
                   gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, viewport.width * 2, viewport.height);
