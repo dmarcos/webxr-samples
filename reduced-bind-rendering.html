@@ -251,7 +251,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
                   gl.bindRenderbuffer(gl.RENDERBUFFER, xrDepthBuffer);
                   gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, viewport.width * 2, viewport.height);
                 }
-                gl.bindRenderbuffer(gl.RENDERBUFFER, depthBuffer);
+                gl.bindRenderbuffer(gl.RENDERBUFFER, xrDepthBuffer);
                 gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, xrDepthBuffer);
               } else {
                 gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, glLayer.depthStencilTexture, 0);
