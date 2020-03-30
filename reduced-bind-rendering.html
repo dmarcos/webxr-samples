@@ -179,7 +179,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         session.requestAnimationFrame(onXRFrame);
 
         if (pose) {
-          console.log("XR bindFramebuffer");
           let glLayer = null;
 
           if (session.isImmersive) {
@@ -273,7 +272,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         }
 
         scene.endFrame();
-        console.log("XR done");
       }
 
       initXR();
