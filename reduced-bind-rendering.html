@@ -62,6 +62,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       let xrButton = null;
       let xrImmersiveRefSpace = null;
       let inlineViewerHelper = null;
+      let xrGLFactory = null;
+      let xrFramebuffer = null;
 
       // WebGL scene globals.
       let gl = null;
@@ -124,14 +126,21 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           + event.session.visibilityState);
       }
 
-      function onSessionStarted(session) {
+      async function onSessionStarted(session) {
         session.addEventListener('end', onSessionEnded);
         session.addEventListener('visibilitychange', onVisibilityChange);
 
         initGL();
 
-        let glLayer = new XRWebGLLayer(session, gl);
-        session.updateRenderState({ baseLayer: glLayer });
+        if (session.isImmersive) {
+          xrFramebuffer = gl.createFramebuffer();
+          xrGLFactory = new XRWebGLLayerFactory(session, gl);
+          let layer = await xrGLFactory.requestProjectionLayer(gl.TEXTURE_2D_ARRAY, {});
+          session.updateRenderState({ layers: [ layer ] });
+        } else {
+          let glLayer = new XRWebGLLayer(session, gl);
+          session.updateRenderState({ baseLayer: glLayer });
+        }
 
         let refSpaceType = session.isImmersive ? 'local' : 'viewer';
         session.requestReferenceSpace(refSpaceType).then((refSpace) => {
@@ -170,8 +179,15 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
         if (pose) {
           console.log("XR bindFramebuffer");
-          let glLayer = session.renderState.baseLayer;
-          gl.bindFramebuffer(gl.FRAMEBUFFER, glLayer.framebuffer);
+          let glLayer = null;
+          let glProjLayer = null;
+
+          if (session.isImmersive) {
+            gl.bindFramebuffer(gl.FRAMEBUFFER, xrFramebuffer);
+          } else {
+            let glLayer = session.renderState.baseLayer;
+            gl.bindFramebuffer(gl.FRAMEBUFFER, glLayer.framebuffer);
+          }
           gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
           // This is a different rendering pattern than the previous samples
@@ -221,6 +237,14 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
           let views = [];
           for (let view of pose.views) {
+            let viewport = nullptr;
+            if (session.isImmersive) {
+              glProjLayer = xrGLFactory.getViewSubImage(session.renderState.layers[0], view);
+              glProjLayer.framebuffer = xrFramebuffer;
+              viewport = glProjLayer.viewport;          
+            } else {
+              viewport = layer.getViewport(view)
+            }
             // Gather all the values needed for one view and push it into the
             // array of views to be drawn. WebXRView is a utility class that
             // holds all the necessary values for drawing a single view.
@@ -228,7 +252,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             // In future samples we'll hide this part away as well by using the
             // scene.drawXRViews() function, which handles gathering these
             // values internally.
-            views.push(new WebXRView(view, glLayer));
+            views.push(new WebXRView(view, glProjLayer, viewport));
           }
 
           scene.drawViewArray(views);
