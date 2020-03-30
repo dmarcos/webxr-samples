@@ -60,6 +60,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       let xrSession = null;
       let xrRefSpace = null;
       let xrGLFactory = null;
+      let xrFramebuffer = null;
 
       // WebGL scene globals.
       let gl = null;
@@ -137,6 +138,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         // with the XRDisplay we're presenting to.
         let canvas = document.createElement('canvas');
         gl = canvas.getContext('webgl', { xrCompatible: true });
+        xrFramebuffer = gl.createFramebuffer();
         xrGLFactory = new XRWebGLLayerFactory(session, gl);
         if(!cylinder_layer) {
           xrGLFactory.requestProjectionLayer(gl.TEXTURE_2D_ARRAY, {}).then((layer) => {
@@ -221,6 +223,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         if (pose) {
           let cnt = 0;
           let arraylength = session.renderState.layers.length;
+          gl.bindFramebuffer(gl.FRAMEBUFFER, xrFramebuffer);
           session.renderState.layers.forEach(function(glLayer) {   
             const width = glLayer.pixelWidth;
             const height = glLayer.pixelHeight;
@@ -230,7 +233,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             } else {
               subimage = xrGLFactory.getSubImage(glLayer);
             }
-            gl.bindFramebuffer(gl.FRAMEBUFFER, subimage.framebuffer);
+            gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, subimage.colorTexture, 0);
             gl.enable(gl.SCISSOR_TEST);
             gl.scissor(0, height/arraylength*cnt, width, height/arraylength);
             cnt++;
