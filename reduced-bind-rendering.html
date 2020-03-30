@@ -248,6 +248,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
               if (glLayer.depthStencilTexture === undefined) {
                 if (xrDepthBuffer === undefined) {
                   xrDepthBuffer = gl.createRenderbuffer();
+                  gl.bindRenderbuffer(gl.RENDERBUFFER, depthBuffer);
                   gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, viewport.width * 2, viewport.height);
                 }
                 gl.bindRenderbuffer(gl.RENDERBUFFER, depthBuffer);
