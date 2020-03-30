@@ -64,6 +64,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       let inlineViewerHelper = null;
       let xrGLFactory = null;
       let xrFramebuffer = null;
+      let xrDepthBuffer = null;
 
       // WebGL scene globals.
       let gl = null;
@@ -242,7 +243,18 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
               glLayer.framebuffer = xrFramebuffer;
               viewport = glLayer.viewport;
               gl.bindFramebuffer(gl.FRAMEBUFFER, xrFramebuffer);
-              gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, glLayer.colorTexture, 0);      
+              gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, glLayer.colorTexture, 0);
+
+              xrDepthBuffer = glLayer.depthStencilTexture;
+              if (glLayer.depthStencilTexture === null) {
+                if (xrDepthBuffer === null) {
+                  xrDepthBuffer = gl.createRenderbuffer();
+                  gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, viewport.width * 2, viewport.height);
+                }
+                gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, xrDepthBuffer, 0);
+              } else {
+                gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, glLayer.depthStencilTexture, 0);
+              }
             } else {
               viewport = glLayer.getViewport(view);
             }
