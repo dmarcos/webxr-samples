@@ -180,12 +180,12 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         if (pose) {
           console.log("XR bindFramebuffer");
           let glLayer = null;
-          let glProjLayer = null;
+          let glLayer = null;
 
           if (session.isImmersive) {
             gl.bindFramebuffer(gl.FRAMEBUFFER, xrFramebuffer);
           } else {
-            let glLayer = session.renderState.baseLayer;
+            glLayer = session.renderState.baseLayer;
             gl.bindFramebuffer(gl.FRAMEBUFFER, glLayer.framebuffer);
           }
           gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -239,11 +239,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           for (let view of pose.views) {
             let viewport = null;
             if (session.isImmersive) {
-              glProjLayer = xrGLFactory.getViewSubImage(session.renderState.layers[0], view);
-              glProjLayer.framebuffer = xrFramebuffer;
-              viewport = glProjLayer.viewport;          
+              glLayer = xrGLFactory.getViewSubImage(session.renderState.layers[0], view);
+              glLayer.framebuffer = xrFramebuffer;
+              viewport = glLayer.viewport;          
             } else {
-              viewport = layer.getViewport(view)
+              viewport = glLayer.getViewport(view)
             }
             // Gather all the values needed for one view and push it into the
             // array of views to be drawn. WebXRView is a utility class that
@@ -252,7 +252,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             // In future samples we'll hide this part away as well by using the
             // scene.drawXRViews() function, which handles gathering these
             // values internally.
-            views.push(new WebXRView(view, glProjLayer, viewport));
+            views.push(new WebXRView(view, glLayer, viewport));
           }
 
           scene.drawViewArray(views);
