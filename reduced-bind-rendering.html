@@ -36,9 +36,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       <details open>
         <summary>Reduced Bind Rendering</summary>
         <p>
-          This sample demonstrates a simple technique to reduce the number of
-          state changes an application needs to make while rendering, potentially
-          enabling better performance.
+          This sample shows how to draw a scene into a projection layer.
           <a class="back" href="./">Back</a>
         </p>
       </details>
@@ -272,8 +270,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         }
 
         scene.endFrame();
-        gl.flush();
-        gl.flush();
       }
 
       initXR();
