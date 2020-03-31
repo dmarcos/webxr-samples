@@ -244,12 +244,20 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
               if (glLayer.depthStencilTexture === null) {
                 if (xrDepthBuffer === null) {
-                  xrDepthBuffer = gl.createRenderbuffer();
-                  gl.bindRenderbuffer(gl.RENDERBUFFER, xrDepthBuffer);
-                  gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, viewport.width * 2, viewport.height);
+                  xrDepthBuffer = gl.createTexture();
+                  gl.bindTexture(gl.TEXTURE_2D, xrDepthBuffer);
+                  const level = 0;
+                  const internalFormat = gl.DEPTH_COMPONENT24;
+                  const border = 0;
+                  const format = gl.DEPTH_COMPONENT;
+                  const type = gl.UNSIGNED_INT;
+                  const data = null;
+                  gl.texImage2D(gl.TEXTURE_2D, level, internalFormat,
+                                viewport.width * 2, viewport.height, border,
+                                format, type, data);
                 }
-                gl.bindRenderbuffer(gl.RENDERBUFFER, xrDepthBuffer);
-                gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, xrDepthBuffer);
+                gl.bindTexture(gl.TEXTURE_2D, xrDepthBuffer);
+                gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, xrDepthBuffer, 0);
               } else {
                 gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, glLayer.depthStencilTexture, 0);
               }
