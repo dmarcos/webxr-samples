@@ -231,7 +231,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             if ((glLayer.stereo === undefined) || glLayer.stereo) {
               subimage = xrGLFactory.getViewSubImage(glLayer, pose.views[0]);
             } else {
-              subimage = xrGLFactory.getSubImage(glLayer);
+              subimage = xrGLFactory.getSubImage(glLayer, frame);
             }
             gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, subimage.colorTexture, 0);
             gl.enable(gl.SCISSOR_TEST);
