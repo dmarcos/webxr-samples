@@ -56,6 +56,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       let xrRefSpace = null;
       let xrGLFactory = null;
       let xrFramebuffer = null;
+      let xrReadFramebuffer = null;
       let videoTexture = null;
       let updatevideo = false;
 
@@ -117,6 +118,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         let canvas = document.createElement('canvas');
         gl = canvas.getContext('webgl', { xrCompatible: true });
         xrFramebuffer = gl.createFramebuffer();
+        xrReadFramebuffer = gl.createFramebuffer();
+        videoTexture= gl.createTexture();
         xrGLFactory = new XRWebGLLayerFactory(session, gl);
 
         xrGLFactory.requestCylinderLayer(gl.TEXTURE_2D, {pixelWidth: 200, pixelHeight: 100, stereo: stereo_layer.checked}).then((layer) => {
@@ -169,7 +172,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         if (pose) {
           let cnt = 0;
           let arraylength = session.renderState.layers.length;
-          gl.bindFramebuffer(gl.FRAMEBUFFER, xrFramebuffer);
+          gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, xrFramebuffer);
           session.renderState.layers.forEach(function(glLayer) {   
             const width = glLayer.pixelWidth;
             const height = glLayer.pixelHeight;
@@ -179,8 +182,13 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             } else {
               subimage = xrGLFactory.getSubImage(glLayer, frame);
             }
-            gl.bindTexture(gl.TEXTURE_2D, subimage.colorTexture);
+            gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, subimage.colorTexture, 0);
+
+            gl.bindTexture(gl.TEXTURE_2D, videoTexture);
             gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, video);
+            gl.bindFramebuffer(gl.READ_FRAMEBUFFER, xrReadFramebuffer);
+            gl.framebufferTexture2D(gl.READ_FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, videoTexture, 0);
+            gl.blitFramebuffer(0, 0, width, height, 0, 0, width, height, gl.COLOR_BUFFER_BIT, filter);
            });
         }
       }
