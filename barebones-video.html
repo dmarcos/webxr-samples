@@ -177,8 +177,16 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             const width = glLayer.pixelWidth;
             const height = glLayer.pixelHeight;
             let subimage = null;
+            let x1offset = 0;
+            let y1offset = 0;
+            let x2offset = glLayer.pixelWidth;
+            let y2offset = glLayer.pixelHeight;
             if ((glLayer.stereo === undefined) || glLayer.stereo) {
-              subimage = xrGLFactory.getViewSubImage(glLayer, pose.views[0]);
+              subimage = xrGLFactory.getViewSubImage(glLayer, view);
+              x1offset = subimage.viewport.x;
+              y1offset = subimage.viewport.y;
+              x2offset = subimage.viewport.x + subimage.viewport.width;
+              y2offset = subimage.viewport.y + subimage.viewport.height;              
             } else {
               subimage = xrGLFactory.getSubImage(glLayer, frame);
             }
@@ -188,7 +196,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, video);
             gl.bindFramebuffer(gl.READ_FRAMEBUFFER, xrReadFramebuffer);
             gl.framebufferTexture2D(gl.READ_FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, videoTexture, 0);
-            gl.blitFramebuffer(0, video.videoHeight/2*cnt, video.videoWidth, video.videoHeight/2*(cnt+1), 0, 0, glLayer.pixelWidth, glLayer.pixelHeight, gl.COLOR_BUFFER_BIT, gl.NEAREST);
+            gl.blitFramebuffer(0, video.videoHeight/2*cnt, video.videoWidth, video.videoHeight/2*(cnt+1), x1offset, y1offset, x2offset, y2offset, gl.COLOR_BUFFER_BIT, gl.NEAREST);
             cnt++;
            });
         }
