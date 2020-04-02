@@ -116,7 +116,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         // Create a WebGL context to render with, initialized to be compatible
         // with the XRDisplay we're presenting to.
         let canvas = document.createElement('canvas');
-        gl = canvas.getContext('webgl', { xrCompatible: true, webgl2: true });
+        gl = canvas.getContext('webgl2', { xrCompatible: true, webgl2: true });
         xrFramebuffer = gl.createFramebuffer();
         xrReadFramebuffer = gl.createFramebuffer();
         videoTexture= gl.createTexture();
