@@ -182,6 +182,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             let x2offset = glLayer.pixelWidth;
             let y2offset = glLayer.pixelHeight;
             if ((glLayer.stereo === undefined) || glLayer.stereo) {
+              let view = pose.views[cnt]);
               subimage = xrGLFactory.getViewSubImage(glLayer, view);
               x1offset = subimage.viewport.x;
               y1offset = subimage.viewport.y;
