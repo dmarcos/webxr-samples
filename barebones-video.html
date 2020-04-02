@@ -175,6 +175,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           session.renderState.layers.forEach(glLayer => {
             let cnt = 0;
             pose.views.forEach(view => {
+              let subimage = null;
               if ((glLayer.stereo === undefined) || glLayer.stereo) {
                 subimage = xrGLFactory.getViewSubImage(glLayer, view);          
               } else {
