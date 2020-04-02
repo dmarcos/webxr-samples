@@ -122,7 +122,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         videoTexture= gl.createTexture();
         xrGLFactory = new XRWebGLLayerFactory(session, gl);
 
-        xrGLFactory.requestCylinderLayer(gl.TEXTURE_2D, {pixelWidth: 200, pixelHeight: 100, stereo: stereo_layer.checked}).then((layer) => {
+        xrGLFactory.requestCylinderLayer(gl.TEXTURE_2D, {pixelWidth: 480, pixelHeight: 270, stereo: stereo_layer.checked}).then((layer) => {
           session.updateRenderState({ layers: [ layer ] });
 
           session.requestReferenceSpace('local').then((refSpace) => {
@@ -155,8 +155,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         // Inform the session that we're ready for the next frame.
         session.requestAnimationFrame(onXRFrame);
 
-        if (!updatevideo )
-          return;
+        //if (!updatevideo )
+        //  return;
 
         updatevideo = false;
 
@@ -188,7 +188,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, video);
             gl.bindFramebuffer(gl.READ_FRAMEBUFFER, xrReadFramebuffer);
             gl.framebufferTexture2D(gl.READ_FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, videoTexture, 0);
-            gl.blitFramebuffer(0, 0, width, height, 0, 0, width, height, gl.COLOR_BUFFER_BIT, gl.NEAREST);
+            gl.blitFramebuffer(0, 0, video.videoWidth, video.videoHeight, 0, 0, width, height, gl.COLOR_BUFFER_BIT, gl.NEAREST);
            });
         }
       }
