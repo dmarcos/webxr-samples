@@ -165,6 +165,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           session.renderState.layers.forEach(function(glLayer) {   
             const width = glLayer.pixelWidth;
             const height = glLayer.pixelHeight;
+            let subimage = null;
             if ((glLayer.stereo === undefined) || glLayer.stereo) {
               subimage = xrGLFactory.getViewSubImage(glLayer, pose.views[0]);
             } else {
