@@ -34,231 +34,245 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
   <body>
     <header>
       <details open>
-        <summary>Barebones WebXR DOM Overlay</summary>
+        <summary>Reduced Bind Rendering</summary>
         <p>
-          This sample demonstrates extremely simple use of an "immersive-ar"
-          session with no library dependencies, with an optional DOM overlay.
-          It doesn't render anything exciting, just draws a square with a slowly
-          changing color to prove it's working.
-          <a class="back" href="./index.html">Back</a>
+          This sample shows how to draw a scene into a projection layer.
+          <a class="back" href="./">Back</a>
         </p>
-        <div id="session-info"></div>
-        <div id="warning-zone"></div>
-        <button id="xr-button" class="barebones-button" disabled>XR not found</button>
-        <button id="xr-button2" class="barebones-button" disabled>XR not found</button>
-        <button id="xr-button3" class="barebones-button" disabled>XR not found</button>
+        <input type="checkbox" id="do_stencil_buffer">stencil buffer</input>
       </details>
     </header>
-    <main style='text-align: center;'>
-      <p>Click 'Enter AR' to see content</p>
-    </main>
-    <script>
-      (function () {
-      'use strict';
+    <script type="module">
+      import {WebXRButton} from './js/util/webxr-button.js';
+      import {Scene, WebXRView} from './js/render/scenes/scene.js';
+      import {Renderer, createWebGLContext} from './js/render/core/renderer.js';
+      import {CubeSeaNode} from './js/render/nodes/cube-sea.js';
+      import {InlineViewerHelper} from './js/util/inline-viewer-helper.js';
+      import {QueryArgs} from './js/util/query-args.js';
+
+      // If requested, use the polyfill to provide support for mobile devices
+      // and devices which only support WebVR.
+      import WebXRPolyfill from './js/third-party/webxr-polyfill/build/webxr-polyfill.module.js';
+      if (QueryArgs.getBool('usePolyfill', true)) {
+        let polyfill = new WebXRPolyfill();
+      }
 
       // XR globals.
-      let xrButton = document.getElementById('xr-button');
-      let xrButton2 = document.getElementById('xr-button2');
-      let xrButton3 = document.getElementById('xr-button3');
-      let xrSession = null;
-      let xrRefSpace = null;
+      let do_stencil_buffer = document.getElementById('do_stencil_buffer');
+      let xrButton = null;
+      let xrImmersiveRefSpace = null;
+      let inlineViewerHelper = null;
       let xrGLFactory = null;
+      let xrFramebuffer = null;
+      let xrDepthBuffer = null;
+      let gl_ext = null;
+      let xr_stencil = false;
 
       // WebGL scene globals.
       let gl = null;
-      let single_layer = true;
-      let cylinder_layer = false;
-      let stereo_layer = document.getElementById("stereo_layer");
-      let fbo;
+      let renderer = null;
+      let scene = new Scene();
+      scene.addNode(new CubeSeaNode());
 
-      // Checks to see if WebXR is available and, if so, requests an XRDevice
-      // that is connected to the system and tests it to ensure it supports the
-      // desired session options.
       function initXR() {
-        // Is WebXR available on this UA?
+        xrButton = new WebXRButton({
+          onRequestSession: onRequestSession,
+          onEndSession: onEndSession
+        });
+        document.querySelector('header').appendChild(xrButton.domElement);
+
         if (navigator.xr) {
-          // If the device allows creation of exclusive sessions set it as the
-          // target of the 'Enter XR' button.
           navigator.xr.isSessionSupported('immersive-vr').then((supported) => {
-            if (supported) {
-              // Updates the button to start an XR session when clicked.
-              xrButton.addEventListener('click', onButtonClicked);
-              xrButton.textContent = 'Show single layer';
-              xrButton.disabled = false;
-              xrButton2.addEventListener('click', onButtonClicked2);
-              xrButton2.textContent = 'Show 2 layers';
-              xrButton2.disabled = false;
-              xrButton3.addEventListener('click', onButtonClicked3);
-              xrButton3.textContent = 'Show single cylinder layer';
-              xrButton3.disabled = false;
-            }
+            xrButton.enabled = supported;
           });
+
+          navigator.xr.requestSession('inline').then(onSessionStarted);
         }
       }
 
-      // Called when the user clicks the button to enter XR. If we don't have a
-      // session we'll request one, and if we do have a session we'll end it.
-      function onButtonClicked() {
-        if (!xrSession) {
-          single_layer = true;
-          cylinder_layer = false;
-          navigator.xr.requestSession('immersive-vr').then(onSessionStarted);
-        } else {
-          xrSession.end();
-        }
-      }
-        
-      function onButtonClicked2() {
-        if (!xrSession) {
-          single_layer = false;
-          cylinder_layer = false;
-          navigator.xr.requestSession('immersive-vr').then(onSessionStarted);
-        } else {
-          xrSession.end();
-        }
-      }
-        
-      function onButtonClicked3() {
-        if (!xrSession) {
-          single_layer = true;
-          cylinder_layer = true;
-          navigator.xr.requestSession('immersive-vr').then(onSessionStarted);
-        } else {
-          xrSession.end();
-        }
-      }
-      // Called when we've successfully acquired a XRSession. In response we
-      // will set up the necessary session state and kick off the frame loop.
-      function onSessionStarted(session) {
-        xrSession = session;
-        xrButton.textContent = 'Exit VR';
+      function initGL() {
+        if (gl)
+          return;
 
-        // Listen for the sessions 'end' event so we can respond if the user
-        // or UA ends the session for any reason.
+        gl = createWebGLContext({
+          xrCompatible: true,
+          webgl2: true
+        });
+        document.body.appendChild(gl.canvas);
+        gl_ext = gl.getExtension('WEBGL_depth_texture');
+
+        function onResize() {
+          gl.canvas.width = gl.canvas.clientWidth * window.devicePixelRatio;
+          gl.canvas.height = gl.canvas.clientHeight * window.devicePixelRatio;
+        }
+        window.addEventListener('resize', onResize);
+        onResize();
+
+        // Set up a non-black clear color so that we can see if something renders wrong.
+        gl.clearColor(0.1, 0.2, 0.3, 1.0);
+
+        renderer = new Renderer(gl);
+
+        scene.setRenderer(renderer);
+      }
+
+      function onRequestSession() {
+        return navigator.xr.requestSession('immersive-vr').then((session) => {
+          xrButton.setSession(session);
+          session.isImmersive = true;
+          onSessionStarted(session);
+        });
+      }
+
+      function onVisibilityChange(event) {
+        console.log("Visibility change for "
+          + (event.session.isImmersive? "immersive" : "non-immersive")
+          + " session: "
+          + event.session.visibilityState);
+      }
+
+      async function onSessionStarted(session) {
         session.addEventListener('end', onSessionEnded);
+        session.addEventListener('visibilitychange', onVisibilityChange);
 
-        // Create a WebGL context to render with, initialized to be compatible
-        // with the XRDisplay we're presenting to.
-        let canvas = document.createElement('canvas');
-        gl = canvas.getContext('webgl2', { xrCompatible: true });
-        xrGLFactory = new XRWebGLLayerFactory(session, gl);
+        initGL();
 
-        fbo = gl.createFramebuffer();
-        gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
-
-        if(!cylinder_layer) {
-          xrGLFactory.requestProjectionLayer(gl.TEXTURE_2D, {}).then((layer) => {
-            if (single_layer) {
-              session.updateRenderState({ layers: [ layer ] });
-
-              session.requestReferenceSpace('local').then((refSpace) => {
-                xrRefSpace = refSpace;
-
-                // Inform the session that we're ready to begin drawing.
-                session.requestAnimationFrame(onXRFrame);
-              });
-            } else {
-              xrGLFactory.requestProjectionLayer(gl.TEXTURE_2D, {}).then((layer2) => {
-                session.updateRenderState({ layers: [ layer, layer2 ] });
-                session.requestReferenceSpace('local').then((refSpace) => {
-                  xrRefSpace = refSpace;
-
-                  // Inform the session that we're ready to begin drawing.
-                  session.requestAnimationFrame(onXRFrame);
-                });
-              });
-            }
-          });
+        if (session.isImmersive) {
+          xrFramebuffer = gl.createFramebuffer();
+          xrGLFactory = new XRWebGLLayerFactory(session, gl);
+          let layer = await xrGLFactory.requestProjectionLayer(gl.TEXTURE_2D, {stencil: do_stencil_buffer.checked});
+          session.updateRenderState({ layers: [ layer ] });
         } else {
-           xrGLFactory.requestCylinderLayer(gl.TEXTURE_2D, {pixelWidth: 200, pixelHeight: 100, stereo: false}).then((layer) => {
-            if (single_layer) {
-              session.updateRenderState({ layers: [ layer ] });
+          let glLayer = new XRWebGLLayer(session, gl);
+          session.updateRenderState({ baseLayer: glLayer });
+        }
 
-              session.requestReferenceSpace('local').then((refSpace) => {
-                xrRefSpace = refSpace;
+        let refSpaceType = session.isImmersive ? 'local' : 'viewer';
+        session.requestReferenceSpace(refSpaceType).then((refSpace) => {
+          if (session.isImmersive) {
+            xrImmersiveRefSpace = refSpace;
+          } else {
+            // In most samples moving forward we'll use this helper class rather
+            // than the reference space directly to inject the necessary logic
+            // for looking around an inline session with mouse and touch input.
+            inlineViewerHelper = new InlineViewerHelper(gl.canvas, refSpace);
+          }
+          session.requestAnimationFrame(onXRFrame);
+        });
+      }
 
-                // Inform the session that we're ready to begin drawing.
-                session.requestAnimationFrame(onXRFrame);
-              });
-            } else {
-              xrGLFactory.requestCylinderLayer(gl.TEXTURE_2D, {pixelWidth: 200, pixelHeight: 100, stereo: false}).then((layer2) => {
-                layer2.radius = 2;
-                layer2.centralAngle = 180;
-                session.updateRenderState({ layers: [ layer, layer2 ] });
-                session.requestReferenceSpace('local').then((refSpace) => {
-                  xrRefSpace = refSpace;
+      function onEndSession(session) {
+        session.end();
+      }
 
-                  // Inform the session that we're ready to begin drawing.
-                  session.requestAnimationFrame(onXRFrame);
-                });
-              });
-            }
-          }); 
+      function onSessionEnded(event) {
+        if (event.session.isImmersive) {
+          xrButton.setSession(null);
         }
       }
 
-      // Called either when the user has explicitly ended the session by calling
-      // session.end() or when the UA has ended the session for any reason.
-      // At this point the session object is no longer usable and should be
-      // discarded.
-      function onSessionEnded(event) {
-        xrSession = null;
-        xrButton.textContent = 'Enter VR';
-        xrButton2.textContent = 'Enter VR';
-        xrButton3.textContent = 'Enter VR';
-
-        // In this simple case discard the WebGL context too, since we're not
-        // rendering anything else to the screen with it.
-        gl = null;
-      }
-
-      // Called every time the XRSession requests that a new frame be drawn.
-      function onXRFrame(time, frame) {
+      function onXRFrame(t, frame) {
         let session = frame.session;
+        let refSpace = session.isImmersive ?
+                         xrImmersiveRefSpace :
+                         inlineViewerHelper.referenceSpace;
+        let pose = frame.getViewerPose(refSpace);
 
-        // Inform the session that we're ready for the next frame.
+        scene.startFrame();
+
         session.requestAnimationFrame(onXRFrame);
 
-        // Get the XRDevice pose relative to the reference space we created
-        // earlier.
-        let pose = frame.getViewerPose(xrRefSpace);
-
-        // Getting the pose may fail if, for example, tracking is lost. So we
-        // have to check to make sure that we got a valid pose before attempting
-        // to render with it. If not in this case we'll just leave the
-        // framebuffer cleared, so tracking loss means the scene will simply
-        // disappear.
         if (pose) {
-          let cnt = 0;
-          let arraylength = session.renderState.layers.length;
-          session.renderState.layers.forEach(function(glLayer) {   
-            const width = glLayer.pixelWidth;
-            const height = glLayer.pixelHeight;
-            let subimage = null;
-            if ((glLayer.stereo === undefined) || glLayer.stereo) {
-              subimage = xrGLFactory.getViewSubImage(glLayer, pose.views[0]);
-            } else {
-              subimage = xrGLFactory.getSubImage(glLayer);
-            }
-            gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
-            // attach the texture as the first color attachment
-            gl.framebufferTexture2D (gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, subimage.colorTexture, 0);
+          let glLayer = null;
 
-            gl.enable(gl.SCISSOR_TEST);
-            gl.scissor(0, height/arraylength*cnt, width, height/arraylength);
-            cnt++;
-            gl.clearColor(Math.cos(cnt * time / 2000),
-                          Math.cos(cnt * time / 4000),
-                          Math.cos(cnt * time / 6000), 1.0);
-            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-           });
+          if (session.isImmersive) {
+            gl.bindFramebuffer(gl.FRAMEBUFFER, xrFramebuffer);
+          } else {
+            glLayer = session.renderState.baseLayer;
+            gl.bindFramebuffer(gl.FRAMEBUFFER, glLayer.framebuffer);
+          }
+          gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+          // This is a different rendering pattern than the previous samples
+          // used, but it should be more efficent. It's very common for apps
+          // being ported to XR to take existing 2D rendering code and call the
+          // top-level "drawScene" function once per XR view, effectively
+          // drawing a single eye at a time. However, this causes many state
+          // changes to be duplicated, which adds to the render loop's overhead.
+          // By providing the matrices and viewports as an array to the drawing
+          // function it can do all the necessary binding once and then call the
+          // actual draw commands in a tighter loop, only changing the matrices
+          // and viewport each time. This does mean that the viewport is changed
+          // much more frequently (N times per object instead of N times per
+          // scene) but it's typically a pretty cheap thing to change and will
+          // almost always be easily outweighed by the savings from not
+          // redundantly binding everything else.
+
+          // For example, a traditional draw loop would do this:
+
+          // Draw(views):
+          //   for each view in views:
+          //     setViewport();
+          //     for each object in scene:
+          //       bindProgram();
+          //       bindMatrices();
+          //       bindUniforms();
+          //       bindBuffers();
+          //       bindTextures();
+          //       draw();
+
+          // While this method results in a loop more like this:
+
+          // Draw(views):
+          //   for each object in scene:
+          //     bindProgram();  
+          //     bindUniforms();
+          //     bindBuffers();
+          //     bindTextures();
+          //     for each view in views:
+          //       setViewport();
+          //       bindMatrices();
+          //       draw();
+
+          // Note that for the complexity of the scene in this samples this
+          // won't make much visible performance difference, but we're using the
+          // more efficient pattern anyway as a way of promoting best practices.
+
+          let views = [];
+          for (let view of pose.views) {
+            let viewport = null;
+            if (session.isImmersive) {
+              glLayer = xrGLFactory.getViewSubImage(session.renderState.layers[0], view);
+              glLayer.framebuffer = xrFramebuffer;
+              viewport = glLayer.viewport;
+              gl.bindFramebuffer(gl.FRAMEBUFFER, xrFramebuffer);
+              gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, glLayer.colorTexture, 0);
+
+              if (do_stencil_buffer.checked) {
+                gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.DEPTH_STENCIL_ATTACHMENT, gl.TEXTURE_2D, glLayer.depthStencilTexture, 0);
+              } else {
+                gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, glLayer.depthStencilTexture, 0);
+              }
+            } else {
+              viewport = glLayer.getViewport(view);
+            }
+            // Gather all the values needed for one view and push it into the
+            // array of views to be drawn. WebXRView is a utility class that
+            // holds all the necessary values for drawing a single view.
+
+            // In future samples we'll hide this part away as well by using the
+            // scene.drawXRViews() function, which handles gathering these
+            // values internally.
+            views.push(new WebXRView(view, glLayer, viewport));
+          }
+
+          scene.drawViewArray(views);
         }
+
+        scene.endFrame();
       }
 
-      // Start the XR application.
       initXR();
-
-    })();
     </script>
   </body>
 </html>
