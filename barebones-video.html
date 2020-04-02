@@ -175,22 +175,16 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           session.renderState.layers.forEach(glLayer => {
             let cnt = 0;
             pose.views.forEach(view => {
-              const width = glLayer.pixelWidth;
-              const height = glLayer.pixelHeight;
-              let subimage = null;
-              let x1offset = 0;
-              let y1offset = 0;
-              let x2offset = glLayer.pixelWidth;
-              let y2offset = glLayer.pixelHeight;
               if ((glLayer.stereo === undefined) || glLayer.stereo) {
-                subimage = xrGLFactory.getViewSubImage(glLayer, view);
-                x1offset = subimage.viewport.x;
-                y1offset = subimage.viewport.y;
-                x2offset = subimage.viewport.x + subimage.viewport.width;
-                y2offset = subimage.viewport.y + subimage.viewport.height;              
+                subimage = xrGLFactory.getViewSubImage(glLayer, view);          
               } else {
                 subimage = xrGLFactory.getSubImage(glLayer, frame);
               }
+              let x1offset = subimage.viewport.x;
+              let y1offset = subimage.viewport.y;
+              let x2offset = subimage.viewport.x + subimage.viewport.width;
+              let y2offset = subimage.viewport.y + subimage.viewport.height;    
+
               gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, subimage.colorTexture, 0);
 
               gl.bindTexture(gl.TEXTURE_2D, videoTexture);
