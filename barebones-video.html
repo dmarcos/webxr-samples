@@ -56,6 +56,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       let xrRefSpace = null;
       let xrGLFactory = null;
       let xrFramebuffer = null;
+      let videoTexture = null;
       let updatevideo = false;
 
       // WebGL scene globals.
@@ -178,14 +179,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             } else {
               subimage = xrGLFactory.getSubImage(glLayer, frame);
             }
-            gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, subimage.colorTexture, 0);
-            gl.enable(gl.SCISSOR_TEST);
-            gl.scissor(0, height/arraylength*cnt, width, height/arraylength);
-            cnt++;
-            gl.clearColor(Math.cos(cnt * time / 2000),
-                          Math.cos(cnt * time / 4000),
-                          Math.cos(cnt * time / 6000), 1.0);
-            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+            gl.bindTexture(gl.TEXTURE_2D, subimage.colorTexture);
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, video);
            });
         }
       }
