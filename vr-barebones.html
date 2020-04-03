@@ -247,7 +247,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
               console.log(cnt + " " + gl.checkFramebufferStatus(xrFramebuffer));
 
-              gl.scissor(0, s0, subimage.viewport.width, subimage.viewport.height);
+              gl.scissor(0, 0, subimage.viewport.width, subimage.viewport.height);
               cnt++;
               gl.clearColor(Math.cos(cnt * time / 2000),
                             Math.cos(cnt * time / 4000),
