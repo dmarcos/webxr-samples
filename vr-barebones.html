@@ -239,9 +239,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
                 subimage = xrGLFactory.getSubImage(glLayer, frame);
               }
               gl.bindFramebuffer(gl.FRAMEBUFFER, xrFramebuffer);
-              gl.viewport(subimage.viewport.x + subimage.viewport.width/numlayers*layeroffset,
+              gl.viewport(subimage.viewport.x,
                           subimage.viewport.y + subimage.viewport.height/numlayers*layeroffset,
-                          subimage.viewport.width/numlayers,
+                          subimage.viewport.width,
                           subimage.viewport.height/numlayers);
 
               if (texture_array.checked) {
@@ -251,9 +251,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
               }
               gl.enable(gl.SCISSOR_TEST);
 
-              gl.scissor(subimage.viewport.x + subimage.viewport.width/numlayers*layeroffset,
+              gl.scissor(subimage.viewport.x,
                          subimage.viewport.y + subimage.viewport.height/numlayers*layeroffset,
-                         subimage.viewport.width/numlayers,
+                         subimage.viewport.width,
                          subimage.viewport.height/numlayers);
               cnt++;
               gl.clearColor(Math.cos(cnt * time / 2000),
