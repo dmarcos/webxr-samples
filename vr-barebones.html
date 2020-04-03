@@ -225,6 +225,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         // disappear.
         if (pose) {
           let cnt = 0;
+          let layeroffset = 0;
+          let numlayers = session.renderState.layers.length;
           let arraylength = session.renderState.layers.length;
           session.renderState.layers.forEach(function(glLayer) {   
             const width = glLayer.pixelWidth;
@@ -238,7 +240,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
                 subimage = xrGLFactory.getSubImage(glLayer, frame);
               }
               gl.bindFramebuffer(gl.FRAMEBUFFER, xrFramebuffer[offset]);
-              gl.viewport(subimage.viewport.x, subimage.viewport.y, subimage.viewport.width, subimage.viewport.height);
+              gl.viewport(subimage.viewport.x + subimage.viewport.width/numlayers*layeroffset,
+                          subimage.viewport.y + subimage.viewport.height/numlayers*layeroffset,
+                          subimage.viewport.width/numlayers,
+                          subimage.viewport.height/numlayers);
 
               if (texture_array.checked) {
                 gl.framebufferTextureLayer(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, subimage.colorTexture, 0, subimage.imageIndex);
@@ -247,7 +252,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
               }
               gl.enable(gl.SCISSOR_TEST);
 
-              gl.scissor(subimage.viewport.x, subimage.viewport.y, subimage.viewport.width, subimage.viewport.height);
+              gl.scissor(subimage.viewport.x + subimage.viewport.width/numlayers*layeroffset,
+                         subimage.viewport.y + subimage.viewport.height/numlayers*layeroffset,
+                         subimage.viewport.width/numlayers,
+                         subimage.viewport.height/numlayers);
               cnt++;
               gl.clearColor(Math.cos(cnt * time / 2000),
                             Math.cos(cnt * time / 4000),
@@ -255,6 +263,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
               gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
               offset++;
             });
+            layeroffset++;
           });
         }
       }
