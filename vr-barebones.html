@@ -245,12 +245,15 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
               }
               gl.enable(gl.SCISSOR_TEST);
 
-              gl.scissor(subimage.viewport.x, subimage.viewport.y, subimage.viewport.width, subimage.viewport.height);
+              console.log(cnt + " " + gl.checkFramebufferStatus(xrFramebuffer));
+
+              gl.scissor(0, s0, subimage.viewport.width, subimage.viewport.height);
               cnt++;
               gl.clearColor(Math.cos(cnt * time / 2000),
                             Math.cos(cnt * time / 4000),
                             Math.cos(cnt * time / 6000), 1.0);
               gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+              console.log(cnt + " " + gl.checkFramebufferStatus(xrFramebuffer));
             });
           });
         }
