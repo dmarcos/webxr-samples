@@ -61,7 +61,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       let xrSession = null;
       let xrRefSpace = null;
       let xrGLFactory = null;
-      let xrFramebuffer = [];
+      let xrFramebuffer = null;
 
       // WebGL scene globals.
       let gl = null;
@@ -140,8 +140,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         // with the XRDisplay we're presenting to.
         let canvas = document.createElement('canvas');
         gl = canvas.getContext('webgl2', { xrCompatible: true });
-        xrFramebuffer[0] = gl.createFramebuffer();
-        xrFramebuffer[1] = gl.createFramebuffer();
+        xrFramebuffer = gl.createFramebuffer();
         xrGLFactory = new XRWebGLLayerFactory(session, gl);
         if(!cylinder_layer) {
           xrGLFactory.requestProjectionLayer(texture_array.checked?gl.TEXTURE_2D_ARRAY:gl.TEXTURE_2D, {}).then((layer) => {
@@ -239,7 +238,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
               } else {
                 subimage = xrGLFactory.getSubImage(glLayer, frame);
               }
-              gl.bindFramebuffer(gl.FRAMEBUFFER, xrFramebuffer[offset]);
+              gl.bindFramebuffer(gl.FRAMEBUFFER, xrFramebuffer);
               gl.viewport(subimage.viewport.x + subimage.viewport.width/numlayers*layeroffset,
                           subimage.viewport.y + subimage.viewport.height/numlayers*layeroffset,
                           subimage.viewport.width/numlayers,
