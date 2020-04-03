@@ -44,7 +44,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         <button id="xr-button2" disabled>XR not found</button>
         <button id="xr-button3" disabled>XR not found</button>
         <input type="checkbox" id="stereo_layer" value="Bike">stereo cylinder layer</input>
-        <input type="checkbox" id="texture_array" value="Bike">stereo cylinder layer</input>
+        <input type="checkbox" id="texture_array" value="Bike">texture array</input>
       </details>
     </header>
     <main style='text-align: center;'>
@@ -235,7 +235,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             } else {
               subimage = xrGLFactory.getSubImage(glLayer, frame);
             }
-            gl.framebufferTextureLayer(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, subimage.colorTexture, 0, subimage.imageIndex);
+            if (texture_array.checked) {
+              gl.framebufferTextureLayer(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, subimage.colorTexture, 0, subimage.imageIndex);
+            } else {
+              gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, subimage.colorTexture, 0);
+            }
             gl.enable(gl.SCISSOR_TEST);
             gl.scissor(0, height/arraylength*cnt, width, height/arraylength);
             cnt++;
