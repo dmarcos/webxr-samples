@@ -245,7 +245,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
               }
               gl.enable(gl.SCISSOR_TEST);
 
-              gl.viewport(subimage.viewport.x, subimage.viewport.y, subimage.viewport.width, subimage.viewport.height);
+              gl.scissor(subimage.viewport.x, subimage.viewport.y, subimage.viewport.width, subimage.viewport.height);
               cnt++;
               gl.clearColor(Math.cos(cnt * time / 2000),
                             Math.cos(cnt * time / 4000),
