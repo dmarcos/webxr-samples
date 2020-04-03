@@ -44,6 +44,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         <button id="xr-button2" disabled>XR not found</button>
         <button id="xr-button3" disabled>XR not found</button>
         <input type="checkbox" id="stereo_layer" value="Bike">stereo cylinder layer</input>
+        <input type="checkbox" id="texture_array" value="Bike">stereo cylinder layer</input>
       </details>
     </header>
     <main style='text-align: center;'>
@@ -67,6 +68,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       let single_layer = true;
       let cylinder_layer = false;
       let stereo_layer = document.getElementById("stereo_layer");
+      let texture_array = document.getElementById("texture_array");
 
       // Checks to see if WebXR is available and, if so, requests an XRDevice
       // that is connected to the system and tests it to ensure it supports the
@@ -137,11 +139,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         // Create a WebGL context to render with, initialized to be compatible
         // with the XRDisplay we're presenting to.
         let canvas = document.createElement('canvas');
-        gl = canvas.getContext('webgl', { xrCompatible: true });
+        gl = canvas.getContext('webgl2', { xrCompatible: true });
         xrFramebuffer = gl.createFramebuffer();
         xrGLFactory = new XRWebGLLayerFactory(session, gl);
         if(!cylinder_layer) {
-          xrGLFactory.requestProjectionLayer(gl.TEXTURE_2D, {}).then((layer) => {
+          xrGLFactory.requestProjectionLayer(texture_array.checked?gl.TEXTURE_2D_ARRAY:gl.TEXTURE_2D, {}).then((layer) => {
             if (single_layer) {
               session.updateRenderState({ layers: [ layer ] });
 
@@ -152,7 +154,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
                 session.requestAnimationFrame(onXRFrame);
               });
             } else {
-              xrGLFactory.requestProjectionLayer(gl.TEXTURE_2D, {}).then((layer2) => {
+              xrGLFactory.requestProjectionLayer(texture_array.checked?gl.TEXTURE_2D_ARRAY:gl.TEXTURE_2D, {}).then((layer2) => {
                 session.updateRenderState({ layers: [ layer, layer2 ] });
                 session.requestReferenceSpace('local').then((refSpace) => {
                   xrRefSpace = refSpace;
@@ -164,8 +166,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             }
           });
         } else {
-           xrGLFactory.requestCylinderLayer(gl.TEXTURE_2D, {pixelWidth: 200, pixelHeight: 100, stereo: stereo_layer.checked}).then((layer) => {
-            if (single_layer) {
+           xrGLFactory.requestCylinderLayer(texture_array.checked?gl.TEXTURE_2D_ARRAY:gl.TEXTURE_2D, {pixelWidth: 200, pixelHeight: 100, stereo: stereo_layer.checked}).then((layer) => {
+            if (single_layer) { 
               session.updateRenderState({ layers: [ layer ] });
 
               session.requestReferenceSpace('local').then((refSpace) => {
@@ -175,7 +177,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
                 session.requestAnimationFrame(onXRFrame);
               });
             } else {
-              xrGLFactory.requestCylinderLayer(gl.TEXTURE_2D, {pixelWidth: 200, pixelHeight: 100, stereo: stereo_layer.checked}).then((layer2) => {
+              xrGLFactory.requestCylinderLayer(texture_array.checked?gl.TEXTURE_2D_ARRAY:gl.TEXTURE_2D, {pixelWidth: 200, pixelHeight: 100, stereo: stereo_layer.checked}).then((layer2) => {
                 layer2.radius = 2;
                 layer2.centralAngle = 180;
                 session.updateRenderState({ layers: [ layer, layer2 ] });
@@ -233,7 +235,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             } else {
               subimage = xrGLFactory.getSubImage(glLayer, frame);
             }
-            gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, subimage.colorTexture, 0);
+            gl.framebufferTextureLayer(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, subimage.colorTexture, 0, subimage.imageIndex);
             gl.enable(gl.SCISSOR_TEST);
             gl.scissor(0, height/arraylength*cnt, width, height/arraylength);
             cnt++;
