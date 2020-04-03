@@ -61,7 +61,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       let xrSession = null;
       let xrRefSpace = null;
       let xrGLFactory = null;
-      let xrFramebuffer = null;
+      let xrFramebuffer = []];
 
       // WebGL scene globals.
       let gl = null;
@@ -140,7 +140,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         // with the XRDisplay we're presenting to.
         let canvas = document.createElement('canvas');
         gl = canvas.getContext('webgl2', { xrCompatible: true });
-        xrFramebuffer = gl.createFramebuffer();
+        xrFramebuffer[0] = gl.createFramebuffer();
+        xrFramebuffer[1] = gl.createFramebuffer();
         xrGLFactory = new XRWebGLLayerFactory(session, gl);
         if(!cylinder_layer) {
           xrGLFactory.requestProjectionLayer(texture_array.checked?gl.TEXTURE_2D_ARRAY:gl.TEXTURE_2D, {}).then((layer) => {
@@ -225,10 +226,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         if (pose) {
           let cnt = 0;
           let arraylength = session.renderState.layers.length;
-          gl.bindFramebuffer(gl.FRAMEBUFFER, xrFramebuffer);
           session.renderState.layers.forEach(function(glLayer) {   
             const width = glLayer.pixelWidth;
             const height = glLayer.pixelHeight;
+            let offset = 0;
             pose.views.forEach(view => {
               let subimage = null;
               if ((glLayer.stereo === undefined) || glLayer.stereo) {
@@ -236,6 +237,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
               } else {
                 subimage = xrGLFactory.getSubImage(glLayer, frame);
               }
+              gl.bindFramebuffer(gl.FRAMEBUFFER, xrFramebuffer[offset]);
               gl.viewport(subimage.viewport.x, subimage.viewport.y, subimage.viewport.width, subimage.viewport.height);
 
               if (texture_array.checked) {
@@ -251,11 +253,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
                             Math.cos(cnt * time / 4000),
                             Math.cos(cnt * time / 6000), 1.0);
               gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-              let sync = gl.fenceSync(gl.SYNC_GPU_COMMANDS_COMPLETE, 0);
-              let signaled = gl.getSyncParameter(sync, gl.SYNC_STATUS);
-              if (signaled != gl.SIGNALED)
-              gl.clientWaitSync(sync, 0, 0);
-              gl.deleteSync(sync);
+              offset++;
             });
           });
         }
