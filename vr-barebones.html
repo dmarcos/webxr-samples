@@ -229,25 +229,30 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           session.renderState.layers.forEach(function(glLayer) {   
             const width = glLayer.pixelWidth;
             const height = glLayer.pixelHeight;
-            let subimage = null;
-            if ((glLayer.stereo === undefined) || glLayer.stereo) {
-              subimage = xrGLFactory.getViewSubImage(glLayer, pose.views[0]);
-            } else {
-              subimage = xrGLFactory.getSubImage(glLayer, frame);
-            }
-            if (texture_array.checked) {
-              gl.framebufferTextureLayer(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, subimage.colorTexture, 0, subimage.imageIndex);
-            } else {
-              gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, subimage.colorTexture, 0);
-            }
-            gl.enable(gl.SCISSOR_TEST);
-            gl.scissor(0, height/arraylength*cnt, width, height/arraylength);
-            cnt++;
-            gl.clearColor(Math.cos(cnt * time / 2000),
-                          Math.cos(cnt * time / 4000),
-                          Math.cos(cnt * time / 6000), 1.0);
-            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-           });
+            pose.views.forEach(view => {
+              let subimage = null;
+              if ((glLayer.stereo === undefined) || glLayer.stereo) {
+                subimage = xrGLFactory.getViewSubImage(glLayer, view);
+              } else {
+                subimage = xrGLFactory.getSubImage(glLayer, frame);
+              }
+              gl.viewport(subimage.viewport.x, subimage.viewport.y, subimage.viewport.width, subimage.viewport.height);
+
+              if (texture_array.checked) {
+                gl.framebufferTextureLayer(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, subimage.colorTexture, 0, subimage.imageIndex);
+              } else {
+                gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, subimage.colorTexture, 0);
+              }
+              gl.enable(gl.SCISSOR_TEST);
+
+              gl.viewport(subimage.viewport.x, subimage.viewport.y, subimage.viewport.width, subimage.viewport.height);
+              cnt++;
+              gl.clearColor(Math.cos(cnt * time / 2000),
+                            Math.cos(cnt * time / 4000),
+                            Math.cos(cnt * time / 6000), 1.0);
+              gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+            });
+          });
         }
       }
 
