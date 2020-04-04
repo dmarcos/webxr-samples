@@ -188,7 +188,12 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         scene.setRenderer(renderer);
 
         stereoUtil = new VRStereoUtil(gl);
-        eqr_texture = loadTexture(gl, 'media/textures/mono_equirect_test.png');
+
+        if (stereo_layer.checked) {
+          eqr_texture = loadTexture(gl, 'media/textures/chess-pano-4k.jpg');
+        } else {
+          eqr_texture = loadTexture(gl, 'media/textures/mono_equirect_test.png');
+        }
       }
 
       function onRequestSession() {
@@ -266,12 +271,12 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           texture_copied = true;
           let fb = gl.createFramebuffer();
           let glayer;
-          if (stereo_layer.checked) {
+          //if (stereo_layer.checked) {
             //TODO!
             //glayer = xrGLFactory.getViewSubImage(session.renderState.layers[0], view);
-          } else {
+          //} else {
             glayer = xrGLFactory.getSubImage(eqr_layer, frame);
-          }
+          //}
           
           gl.viewport(0, 0, eqr_texture_width, eqr_texture_height);
           gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
