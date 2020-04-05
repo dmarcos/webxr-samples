@@ -63,6 +63,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       let xrGLFactory = null;
       let xrFramebuffer = null;
 
+      let ttt;
+
       // WebGL scene globals.
       let gl = null;
       let single_layer = true;
@@ -140,6 +142,22 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         // with the XRDisplay we're presenting to.
         let canvas = document.createElement('canvas');
         gl = canvas.getContext('webgl2', { xrCompatible: true });
+
+
+        ttt = gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D_ARRAY, ttt);
+        gl.texImage3D(gl.TEXTURE_2D_ARRAY,
+              0,                                          // level
+              gl.RGBA,                                    // internalFormat
+              100,                                          // width
+              100,                                          // height
+              2,                                          // depth
+              0,                                          // border
+              gl.RGBA,                                    // format
+              gl.UNSIGNED_BYTE,                           // type
+              null);  // data
+        gl.bindTexture(gl.TEXTURE_2D_ARRAY, null;
+
         xrFramebuffer = gl.createFramebuffer();
         xrGLFactory = new XRWebGLLayerFactory(session, gl);
         if(!cylinder_layer) {
@@ -245,7 +263,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
                           subimage.viewport.height/numlayers);
 
               if (texture_array.checked) {
-                gl.framebufferTextureLayer(gl.DRAW_FRAMEBUFFER, gl.COLOR_ATTACHMENT0, subimage.colorTexture, 0, subimage.imageIndex);
+//                gl.framebufferTextureLayer(gl.DRAW_FRAMEBUFFER, gl.COLOR_ATTACHMENT0, subimage.colorTexture, 0, subimage.imageIndex);
+                gl.framebufferTextureLayer(gl.DRAW_FRAMEBUFFER, gl.COLOR_ATTACHMENT0, ttt, 0, subimage.imageIndex);
               } else {
                 gl.framebufferTexture2D(gl.DRAW_FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, subimage.colorTexture, 0);
               }
