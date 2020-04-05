@@ -222,7 +222,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           xrFramebuffer = gl.createFramebuffer();
           xrGLFactory = new XRWebGLLayerFactory(session, gl);
           let projlayer = await xrGLFactory.requestProjectionLayer(gl.TEXTURE_2D, {stencil: do_stencil_buffer.checked});
-          let eqrlayer = await xrGLFactory.requestEquirectLayer(gl.TEXTURE_2D, {pixelWidth: eqr_texture_width, pixelHeight: eqr_texture_height, stereo: stereo_layer.checked});
+          let eqrlayer = await xrGLFactory.requestEquirectLayer(gl.TEXTURE_2D, {
+            pixelWidth: eqr_texture_width, pixelHeight: eqr_texture_height, 
+            stereo: stereo_layer.checked, layout: "top-to-bottom"
+          });
           session.updateRenderState({ layers: [ eqrlayer, projlayer ] });
         } else {
           let glLayer = new XRWebGLLayer(session, gl);
