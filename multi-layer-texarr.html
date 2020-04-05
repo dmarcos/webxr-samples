@@ -250,7 +250,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
                 gl.framebufferTexture2D(gl.DRAW_FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, subimage.colorTexture, 0);
               }
               let status = gl.checkFramebufferStatus(gl.DRAW_FRAMEBUFFER);
-              if (status != 0) {
+              if (status != gl.FRAMEBUFFER_COMPLETE) {
                 console.log("Ooops! subimage.imageIndex = " + subimage.imageIndex + ", status = " + status);
               }
               gl.enable(gl.SCISSOR_TEST);
