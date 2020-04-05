@@ -263,8 +263,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
                           subimage.viewport.height/numlayers);
 
               if (texture_array.checked) {
-//                gl.framebufferTextureLayer(gl.DRAW_FRAMEBUFFER, gl.COLOR_ATTACHMENT0, subimage.colorTexture, 0, subimage.imageIndex);
-                gl.framebufferTextureLayer(gl.DRAW_FRAMEBUFFER, gl.COLOR_ATTACHMENT0, ttt, 0, subimage.imageIndex);
+                gl.framebufferTextureLayer(gl.DRAW_FRAMEBUFFER, gl.COLOR_ATTACHMENT0, subimage.colorTexture, 0, subimage.imageIndex);
+//                gl.framebufferTextureLayer(gl.DRAW_FRAMEBUFFER, gl.COLOR_ATTACHMENT0, ttt, 0, subimage.imageIndex);
               } else {
                 gl.framebufferTexture2D(gl.DRAW_FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, subimage.colorTexture, 0);
               }
