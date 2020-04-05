@@ -249,7 +249,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
               } else {
                 gl.framebufferTexture2D(gl.DRAW_FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, subimage.colorTexture, 0);
               }
-              let status = gl.checkFramebufferStatus();
+              let status = gl.checkFramebufferStatus(gl.DRAW_FRAMEBUFFER);
               if (status != 0) {
                 console.log("Ooops! subimage.imageIndex = " + subimage.imageIndex + ", status = " + status);
               }
