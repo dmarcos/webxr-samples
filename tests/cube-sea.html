@@ -239,6 +239,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       let gl = null;
       let renderer = null;
       let scene = new Scene();
+      var paused = false;
       scene.addNode(cubeSea);
 
       function initXR() {
@@ -256,6 +257,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
         let xrMode = appSettings.arMode ? 'immersive-ar' : 'immersive-vr';
         if (navigator.xr) {
+          navigator.xr.addEventListener('sessiongranted', onSessionGranted);
           navigator.xr.isSessionSupported(xrMode).then((supported) => {
             xrButton.enabled = supported;
           });
@@ -278,6 +280,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           document.body.appendChild(gl.canvas);
 
           function onResize() {
+            console.log("devicePixelRatio = " + window.devicePixelRatio + " w = " + gl.canvas.clientWidth + ", h = " + gl.canvas.clientHeight);
             gl.canvas.width = gl.canvas.clientWidth * window.devicePixelRatio;
             gl.canvas.height = gl.canvas.clientHeight * window.devicePixelRatio;
           }
@@ -292,9 +295,16 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         scene.setRenderer(renderer);
       }
 
+      function onSessionGranted() {
+        console.log("onSessionGranted");
+        onRequestSession();
+      }
       function onRequestSession() {
+        console.log("onRequestSession");
         let xrMode = appSettings.arMode ? 'immersive-ar' : 'immersive-vr';
-        return navigator.xr.requestSession(xrMode).then((session) => {
+        return navigator.xr.requestSession('immersive-vr', {
+            optionalFeatures: ['high-refresh-rate', 'no-fixed-foveation'] 
+        }).then((session) => {
           xrButton.setSession(session);
           session.isImmersive = true;
           onSessionStarted(session);
@@ -303,6 +313,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
       function onSessionStarted(session) {
         session.addEventListener('end', onSessionEnded);
+        session.addEventListener('visibilitychange', onVisibilityChange);
+
+        session.addEventListener('selectstart', () => { console.log("selectstart"); });
+        session.addEventListener('select', () => { console.log("select"); });
+        session.addEventListener('selectend', () => { console.log("selectend"); });
 
         initGL();
         scene.inputRenderer.useProfileControllerMeshes(session);
@@ -328,7 +343,21 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         session.end();
       }
 
+      function onVisibilityChange(event) {
+        if (session.isImmersive) {
+          console.log("Visibility change: " + event.session.visibilityState);
+          if (event.session.visibilityState == "visible") {
+            paused = false;
+          } else {
+            paused = true;
+          }
+        }
+      }
+
       function onSessionEnded(event) {
+        event.session.end().then(function() { console.log("ended successfully"); }, 
+                                 function() { console.log("already ended") });
+         
         xrButton.setSession(null);
       }
 
@@ -344,7 +373,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
         frameNum++;
 
-        scene.startFrame();
+        if (!paused) 
+          scene.startFrame();
 
         if (appSettings.simulatedWorkTimeMs > 0) {
           // Simulate a heavy Javascript workload
@@ -373,11 +403,13 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
         scene.clear = !appSettings.arMode;
 
-        scene.updateInputSources(frame, refSpace);
+        if (!paused) 
+          scene.updateInputSources(frame, refSpace);
 
         scene.drawXRFrame(frame, pose);
 
-        scene.endFrame();
+        if (!paused) 
+          scene.endFrame();
       }
 
       // Start the XR application.

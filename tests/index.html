@@ -136,6 +136,30 @@
               { title: 'Reference Space Invert', category: 'We Hate Matrix Math',
               path: 'ref-space-invert.html',
               description: 'Tests creating an offset reference space with the viewer pose, which should cancel out the pose and report the viewer at the origin.' },
+
+            { title: 'VR Navigation', category: 'Navigation',
+              path: 'navigation.html',
+              description: 'Tests vr-to-vr navigation in WebXR!' },
+
+            { title: 'Canvas resize', category: 'Canvas resize',
+              path: 'x-canvas-resize.html',
+              description: 'Testing canvas resizing in WebXR: it should NOT cause rendering artifacts or affect FBO size' },
+
+            { title: 'Refresh rate/foveation', category: 'Session options',
+              path: 'refresh-rate-foveation.html',
+              description: 'Testing new session options for refresh rate and foveation' },
+
+            { title: 'Fixed foveation', category: 'Session options',
+              path: 'fixed-foveation.html',
+              description: 'Testing fixed foveation' },
+
+            { title: 'Missing frames', category: 'Rendering',
+              path: 'missing-frames.html',
+              description: 'Testing missing frames' },
+
+            { title: 'Stencil Cube Sea', category: 'Cube Sea',
+              path: 'stencil-cube-sea.html',
+              description: 'Stencil test' },
           ];
 
           let mainElement = document.getElementById("main");

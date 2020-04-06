@@ -28,13 +28,13 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
     <link rel='icon' type='image/png' sizes='32x32' href='favicon-32x32.png'>
     <link rel='icon' type='image/png' sizes='96x96' href='favicon-96x96.png'>
     <link rel='stylesheet' href='css/common.css'>
+    <title>Barebones Video</title>
 
-    <title>Barebones VR</title>
   </head>
   <body>
     <header>
       <details open>
-        <summary>Barebones VR</summary>
+        <summary>Barebones Video</summary>
         <p>
           This sample show a mono or stereo video on a cylinder layer
           <a class="back" href="./">Back</a>
@@ -176,6 +176,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             let cnt = 0;
             pose.views.forEach(view => {
               let subimage = null;
+
               if ((glLayer.stereo === undefined) || glLayer.stereo) {
                 subimage = xrGLFactory.getViewSubImage(glLayer, view);          
               } else {
