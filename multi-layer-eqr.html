@@ -106,15 +106,15 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       // Initialize a texture and load an image.
       // When the image finished loading copy it into the texture.
       //
-      function loadTexture(gl, url) {
+      function loadTexture(gl, url, complete_callback) {
         const texture = gl.createTexture();
-        loadIntoTexture(gl, texture, url);
+        loadIntoTexture(gl, texture, url, complete_callback);
         return texture;
       }
       function isPowerOf2(value) {
         return (value & (value - 1)) == 0;
       }
-      function loadIntoTexture(gl, texture, url) {
+      function loadIntoTexture(gl, texture, url, complete_callback) {
         gl.bindTexture(gl.TEXTURE_2D, texture);
 
         // Because images have to be download over the internet
@@ -158,7 +158,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
              gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
              gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
           }
+          complete_callback();
         };
+        eqr_texture_width = eqr_texture_height = undefined;
         image.src = url;
       }
 
@@ -214,24 +216,23 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
         if (session.isImmersive) {
           if (stereo_layer.checked) {
-            eqr_texture = loadTexture(gl, 'media/textures/chess-pano-4k.jpg');
+            eqr_texture = loadTexture(gl, 'media/textures/chess-pano-4k.jpg', () => {
+              onImageLoaded(session);
+            });
           } else {
-            eqr_texture = loadTexture(gl, 'media/textures/mono_equirect_test.png');
+            eqr_texture = loadTexture(gl, 'media/textures/mono_equirect_test.png', () => {
+              onImageLoaded(session);
+            });
           }
           texture_copied = false;
-          xrFramebuffer = gl.createFramebuffer();
-          xrGLFactory = new XRWebGLLayerFactory(session, gl);
-          let projlayer = await xrGLFactory.requestProjectionLayer(gl.TEXTURE_2D, {stencil: do_stencil_buffer.checked});
-          let eqrlayer = await xrGLFactory.requestEquirectLayer(gl.TEXTURE_2D, {
-            pixelWidth: eqr_texture_width, pixelHeight: eqr_texture_height / (stereo_layer.checked ? 2 : 1), 
-            stereo: stereo_layer.checked, layout: "stereo-top-bottom"
-          });
-          session.updateRenderState({ layers: [ eqrlayer, projlayer ] });
+          finalizeSessionStart(session);
         } else {
           let glLayer = new XRWebGLLayer(session, gl);
           session.updateRenderState({ baseLayer: glLayer });
+          finalizeSessionStart(session);
         }
-
+      }
+      function finalizeSessionStart(session) {
         let refSpaceType = session.isImmersive ? 'local' : 'viewer';
         session.requestReferenceSpace(refSpaceType).then((refSpace) => {
           if (session.isImmersive) {
@@ -244,6 +245,16 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           }
           session.requestAnimationFrame(onXRFrame);
         });
+      }
+      async function onImageLoaded(session) {
+        xrFramebuffer = gl.createFramebuffer();
+        xrGLFactory = new XRWebGLLayerFactory(session, gl);
+        let projlayer = await xrGLFactory.requestProjectionLayer(gl.TEXTURE_2D, {stencil: do_stencil_buffer.checked});
+        let eqrlayer = await xrGLFactory.requestEquirectLayer(gl.TEXTURE_2D, {
+          pixelWidth: eqr_texture_width, pixelHeight: eqr_texture_height / (stereo_layer.checked ? 2 : 1), 
+          stereo: stereo_layer.checked, layout: "stereo-top-bottom"
+        });
+        session.updateRenderState({ layers: [ eqrlayer, projlayer ] });
       }
 
       function onEndSession(session) {
