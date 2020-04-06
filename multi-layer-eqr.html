@@ -251,7 +251,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         let projlayer = await xrGLFactory.requestProjectionLayer(gl.TEXTURE_2D, {stencil: do_stencil_buffer.checked});
         let eqrlayer = await xrGLFactory.requestEquirectLayer(gl.TEXTURE_2D, {
           pixelWidth: eqr_texture_width, pixelHeight: eqr_texture_height / (stereo_layer.checked ? 2 : 1), 
-          layout: ((stereo_layer.checked) ? "stereo-top-bottom" : "mono"
+          layout: ((stereo_layer.checked) ? "stereo-top-bottom" : "mono")
         });
         session.updateRenderState({ layers: [ eqrlayer, projlayer ] });
 
