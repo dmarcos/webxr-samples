@@ -225,7 +225,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             });
           }
           texture_copied = false;
-          finalizeSessionStart(session);
         } else {
           let glLayer = new XRWebGLLayer(session, gl);
           session.updateRenderState({ baseLayer: glLayer });
@@ -255,6 +254,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           stereo: stereo_layer.checked, layout: "stereo-top-bottom"
         });
         session.updateRenderState({ layers: [ eqrlayer, projlayer ] });
+
+        finalizeSessionStart(session);
       }
 
       function onEndSession(session) {
