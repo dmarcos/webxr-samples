@@ -30,7 +30,7 @@ export class WebXRView extends RenderView {
     super(
       view ? view.projectionMatrix : null,
       view ? view.transform : null,
-      viewport,
+      viewport ? viewport : ((layer && view) ? layer.getViewport(view) : null),
       view ? view.eye : 'left'
     );
   }
@@ -245,9 +245,9 @@ export class Scene extends Node {
     }
 
     gl.bindFramebuffer(gl.FRAMEBUFFER, layer.framebuffer);
-    if (layer.colorTexture) {
-      gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, layer.colorTexture, 0);
-    }
+  //  if (layer.colorTexture) {
+  //    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, layer.colorTexture, 0);
+  //  }
 
     if (this.clear) {
       gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
