@@ -277,7 +277,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         let cyllayer = await xrGLFactory.requestCylinderLayer(gl.TEXTURE_2D, {
           pixelWidth: cyl_texture_width, pixelHeight: cyl_texture_height / (stereo_layer.checked ? 2 : 1), 
           centralAngle: 90,
-          aspectRatio: 2,
+          aspectRatio: 4,
           radius: 10,
           layout: ((stereo_layer.checked) ? "stereo-top-bottom" : "mono")
         });
