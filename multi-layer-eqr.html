@@ -73,6 +73,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       let xr_stencil = false;
       let texture_copied = false;
       let stereoUtil = null;
+      let number_of_images = 0;
 
       // WebGL scene globals.
       let stereo_layer = document.getElementById("stereo_layer");
@@ -85,6 +86,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       let eqr_texture_height;
       let eqr_layer = null;
       let proj_layer = null;
+      let cyl_texture;
+      let cyl_texture_width;
+      let cyl_texture_height;
+      let cyl_layer = null;
 
       function initXR() {
         xrButton = new WebXRButton({
@@ -139,8 +144,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           gl.bindTexture(gl.TEXTURE_2D, texture);
           gl.texImage2D(gl.TEXTURE_2D, level, internalFormat,
                         srcFormat, srcType, image);
-          eqr_texture_width  = image.width;
-          eqr_texture_height = image.height;
 
           // WebGL1 has different requirements for power of 2 images
           // vs non power of 2 images so check if the image is a
@@ -158,7 +161,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
              gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
              gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
           }
-          complete_callback();
+          complete_callback(image.width, image.height);
         };
         eqr_texture_width = eqr_texture_height = undefined;
         image.src = url;
@@ -216,11 +219,27 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
         if (session.isImmersive) {
           if (stereo_layer.checked) {
-            eqr_texture = loadTexture(gl, 'media/textures/chess-pano-4k.jpg', () => {
+            number_of_images = 2;
+            eqr_texture = loadTexture(gl, 'media/textures/chess-pano-4k.jpg', (w,h) => {
+              eqr_texture_width  = w;
+              eqr_texture_height = h;
+              onImageLoaded(session);
+            });
+            cyl_texture = loadTexture(gl, 'media/textures/stereo-top-bottom-image.png', (w,h) => {
+              cyl_texture_width  = w;
+              cyl_texture_height = h;
               onImageLoaded(session);
             });
           } else {
-            eqr_texture = loadTexture(gl, 'media/textures/mono_equirect_test.png', () => {
+            number_of_images = 2;
+            eqr_texture = loadTexture(gl, 'media/textures/mono_equirect_test.png', (w, h) => {
+              eqr_texture_width  = w;
+              eqr_texture_height = h;
+              onImageLoaded(session);
+            });
+            cyl_texture = loadTexture(gl, 'media/textures/eilenriede-park-2k.png', (w,h) => {
+              cyl_texture_width  = w;
+              cyl_texture_height = h;
               onImageLoaded(session);
             });
           }
@@ -246,6 +265,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         });
       }
       async function onImageLoaded(session) {
+        if (--number_of_images != 0)
+          return;
         xrFramebuffer = gl.createFramebuffer();
         xrGLFactory = new XRWebGLLayerFactory(session, gl);
         let projlayer = await xrGLFactory.requestProjectionLayer(gl.TEXTURE_2D, {stencil: do_stencil_buffer.checked});
@@ -253,7 +274,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           pixelWidth: eqr_texture_width, pixelHeight: eqr_texture_height / (stereo_layer.checked ? 2 : 1), 
           layout: ((stereo_layer.checked) ? "stereo-top-bottom" : "mono")
         });
-        session.updateRenderState({ layers: [ eqrlayer, projlayer ] });
+        let cyllayer = await xrGLFactory.requestCylinderLayer(gl.TEXTURE_2D, {
+          pixelWidth: cyl_texture_width, pixelHeight: cyl_texture_height / (stereo_layer.checked ? 2 : 1), 
+          layout: ((stereo_layer.checked) ? "stereo-top-bottom" : "mono")
+        });
+        session.updateRenderState({ layers: [ eqrlayer, projlayer, cyllayer ] });
 
         finalizeSessionStart(session);
       }
@@ -282,6 +307,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         if (session.isImmersive && !texture_copied) {
           eqr_layer = session.renderState.layers[0];
           proj_layer = session.renderState.layers[1];
+          cyl_layer = session.renderState.layers[2];
 
           texture_copied = true;
           let fb = gl.createFramebuffer();
@@ -301,6 +327,16 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           gl.clearColor(1, 0, 0, 1);
           gl.clear(gl.COLOR_BUFFER_BIT);
           stereoUtil.blit(false, eqr_texture, 0, 0, 1, 1, eqr_texture_width, eqr_texture_height);
+          
+          glayer = xrGLFactory.getSubImage(cyl_layer, frame);
+          gl.viewport(0, 0, cyl_texture_width, cyl_texture_height);
+          gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
+          gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, glayer.colorTexture, 0);
+
+          gl.disable(gl.SCISSOR_TEST);
+          gl.clearColor(0, 1, 0, 1);
+          gl.clear(gl.COLOR_BUFFER_BIT);
+          stereoUtil.blit(false, cyl_texture, 0, 0, 1, 1, cyl_texture_width, cyl_texture_height);
           
         }
         if (!session.isImmersive) {
