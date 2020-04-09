@@ -268,7 +268,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         if (--number_of_images != 0)
           return;
         xrFramebuffer = gl.createFramebuffer();
-        xrGLFactory = new XRWebGLLayerFactory(session, gl);
+        xrGLFactory = new XRWebGLBinding(session, gl);
         let projlayer = xrGLFactory.requestProjectionLayer("texture", {stencil: do_stencil_buffer.checked});
         let eqrlayer = xrGLFactory.requestEquirectLayer("texture", {
           pixelWidth: eqr_texture_width, pixelHeight: eqr_texture_height / (stereo_layer.checked ? 2 : 1), 
