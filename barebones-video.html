@@ -28,8 +28,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
     <link rel='icon' type='image/png' sizes='32x32' href='favicon-32x32.png'>
     <link rel='icon' type='image/png' sizes='96x96' href='favicon-96x96.png'>
     <link rel='stylesheet' href='css/common.css'>
-
     <title>Barebones Video</title>
+
   </head>
   <body>
     <header>
@@ -120,17 +120,16 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         xrFramebuffer = gl.createFramebuffer();
         xrReadFramebuffer = gl.createFramebuffer();
         videoTexture= gl.createTexture();
-        xrGLFactory = new XRWebGLLayerFactory(session, gl);
+        xrGLFactory = new XRWebGLBinding(session, gl);
 
-        xrGLFactory.requestCylinderLayer(gl.TEXTURE_2D, {pixelWidth: 480, pixelHeight: 270, layout: "stereo-top-bottom"}).then((layer) => {
-          session.updateRenderState({ layers: [ layer ] });
+        let layer = xrGLFactory.createCylinderLayer("texture", {pixelWidth: 480, pixelHeight: 270, stereo: (stereo_layer.checked ? "stereo" : "mono")});
+        session.updateRenderState({ layers: [ layer ] });
 
-          session.requestReferenceSpace('local').then((refSpace) => {
-            xrRefSpace = refSpace;
+        session.requestReferenceSpace('local').then((refSpace) => {
+        xrRefSpace = refSpace;
 
-            // Inform the session that we're ready to begin drawing.
-            session.requestAnimationFrame(onXRFrame);
-          });
+          // Inform the session that we're ready to begin drawing.
+        session.requestAnimationFrame(onXRFrame);
         });
       }
 
@@ -193,7 +192,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 /*
             pose.views.forEach(view => {
               let subimage = null;
-              if ((glLayer.layout === undefined) || glLayer.layout != "mono") {
+
+              if (glLayer.layout !== "mono") {
                 subimage = xrGLFactory.getViewSubImage(glLayer, view);          
               } else {
                 subimage = xrGLFactory.getSubImage(glLayer, frame);

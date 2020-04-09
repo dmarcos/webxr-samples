@@ -131,7 +131,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           + event.session.visibilityState);
       }
 
-      async function onSessionStarted(session) {
+      function onSessionStarted(session) {
         session.addEventListener('end', onSessionEnded);
         session.addEventListener('visibilitychange', onVisibilityChange);
 
@@ -139,8 +139,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
         if (session.isImmersive) {
           xrFramebuffer = gl.createFramebuffer();
-          xrGLFactory = new XRWebGLLayerFactory(session, gl);
-          let layer = await xrGLFactory.requestProjectionLayer(gl.TEXTURE_2D, {stencil: do_stencil_buffer.checked});
+          xrGLFactory = new XRWebGLBinding(session, gl);
+          let layer = xrGLFactory.createProjectionLayer("texture", {stencil: do_stencil_buffer.checked});
           session.updateRenderState({ layers: [ layer ] });
         } else {
           let glLayer = new XRWebGLLayer(session, gl);

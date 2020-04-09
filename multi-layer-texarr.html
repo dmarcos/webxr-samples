@@ -159,55 +159,51 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         gl.bindTexture(gl.TEXTURE_2D_ARRAY, null);
 
         xrFramebuffer = gl.createFramebuffer();
-        xrGLFactory = new XRWebGLLayerFactory(session, gl);
+        xrGLFactory = new XRWebGLBinding(session, gl);
         if(!cylinder_layer) {
-          xrGLFactory.requestProjectionLayer(texture_array.checked?gl.TEXTURE_2D_ARRAY:gl.TEXTURE_2D, {}).then((layer) => {
-            if (single_layer) {
-              session.updateRenderState({ layers: [ layer ] });
+          let layer = xrGLFactory.createProjectionLayer(texture_array.checked?"texture-array":"texture", {});
+          if (single_layer) {
+            session.updateRenderState({ layers: [ layer ] });
 
-              session.requestReferenceSpace('local').then((refSpace) => {
-                xrRefSpace = refSpace;
+            session.requestReferenceSpace('local').then((refSpace) => {
+              xrRefSpace = refSpace;
 
-                // Inform the session that we're ready to begin drawing.
-                session.requestAnimationFrame(onXRFrame);
-              });
-            } else {
-              xrGLFactory.requestProjectionLayer(texture_array.checked?gl.TEXTURE_2D_ARRAY:gl.TEXTURE_2D, {}).then((layer2) => {
-                session.updateRenderState({ layers: [ layer, layer2 ] });
-                session.requestReferenceSpace('local').then((refSpace) => {
-                  xrRefSpace = refSpace;
+              // Inform the session that we're ready to begin drawing.
+              session.requestAnimationFrame(onXRFrame);
+            });
+          } else {
+            let layer2 = xrGLFactory.createProjectionLayer(texture_array.checked?"texture-array":"texture", {});
+            session.updateRenderState({ layers: [ layer, layer2 ] });
+            session.requestReferenceSpace('local').then((refSpace) => {
+              xrRefSpace = refSpace;
 
-                  // Inform the session that we're ready to begin drawing.
-                  session.requestAnimationFrame(onXRFrame);
-                });
-              });
-            }
-          });
+              // Inform the session that we're ready to begin drawing.
+              session.requestAnimationFrame(onXRFrame);
+            });
+          }
         } else {
-           xrGLFactory.requestCylinderLayer(texture_array.checked?gl.TEXTURE_2D_ARRAY:gl.TEXTURE_2D, {pixelWidth: 200, pixelHeight: 100, stereo: stereo_layer.checked}).then((layer) => {
-            if (single_layer) { 
-              session.updateRenderState({ layers: [ layer ] });
+          let layer = xrGLFactory.createCylinderLayer(texture_array.checked?"texture-array":"texture", {pixelWidth: 200, pixelHeight: 100, stereo: (stereo_layer.checked ? "stereo" : "mono")});
+          if (single_layer) { 
+            session.updateRenderState({ layers: [ layer ] });
 
-              session.requestReferenceSpace('local').then((refSpace) => {
-                xrRefSpace = refSpace;
+            session.requestReferenceSpace('local').then((refSpace) => {
+              xrRefSpace = refSpace;
 
-                // Inform the session that we're ready to begin drawing.
-                session.requestAnimationFrame(onXRFrame);
-              });
-            } else {
-              xrGLFactory.requestCylinderLayer(texture_array.checked?gl.TEXTURE_2D_ARRAY:gl.TEXTURE_2D, {pixelWidth: 200, pixelHeight: 100, stereo: stereo_layer.checked}).then((layer2) => {
-                layer2.radius = 2;
-                layer2.centralAngle = 180;
-                session.updateRenderState({ layers: [ layer, layer2 ] });
-                session.requestReferenceSpace('local').then((refSpace) => {
-                  xrRefSpace = refSpace;
+              // Inform the session that we're ready to begin drawing.
+              session.requestAnimationFrame(onXRFrame);
+            });
+          } else {
+            let layer2 = xrGLFactory.createCylinderLayer(texture_array.checked?"texture-array":"texture", {pixelWidth: 200, pixelHeight: 100, stereo: (stereo_layer.checked ? "stereo" : "mono")});
+            layer2.radius = 2;
+            layer2.centralAngle = 180;
+            session.updateRenderState({ layers: [ layer, layer2 ] });
+            session.requestReferenceSpace('local').then((refSpace) => {
+              xrRefSpace = refSpace;
 
-                  // Inform the session that we're ready to begin drawing.
-                  session.requestAnimationFrame(onXRFrame);
-                });
-              });
-            }
-          }); 
+              // Inform the session that we're ready to begin drawing.
+              session.requestAnimationFrame(onXRFrame);
+            });
+          }
         }
       }
 
@@ -251,7 +247,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             let offset = 0;
             pose.views.forEach(view => {
               let subimage = null;
-              if ((glLayer.stereo === undefined) || glLayer.stereo) {
+              if (glLayer.layout !== "mono") {
                 subimage = xrGLFactory.getViewSubImage(glLayer, view);
               } else {
                 subimage = xrGLFactory.getSubImage(glLayer, frame);
