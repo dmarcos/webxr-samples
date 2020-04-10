@@ -43,6 +43,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         </p>
         <input type="checkbox" id="do_stencil_buffer">stencil buffer</input>
         <input type="checkbox" id="stereo_layer" value="Bike">stereo equirect layer</input>
+        <input type="checkbox" id="change_order">change order</input>
       </details>
     </header>
     <script type="module">
@@ -90,6 +91,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       let cyl_texture_width;
       let cyl_texture_height;
       let cyl_layer = null;
+      let eqr_layer_idx = 0;
+      let proj_layer_idx = 1;
+      let cyl_layer_idx = 2;
 
       function initXR() {
         xrButton = new WebXRButton({
@@ -281,8 +285,17 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           radius: 10,
           layout: ((stereo_layer.checked) ? "stereo-top-bottom" : "mono")
         });
-        session.updateRenderState({ layers: [ eqrlayer, cyllayer, projlayer ] });
-
+        if (change_order.checked) {
+          session.updateRenderState({ layers: [ eqrlayer, cyllayer, projlayer ] });
+          eqr_layer_idx = 0;
+          cyl_layer_idx = 1;
+          proj_layer_idx = 2;
+        } else {
+          session.updateRenderState({ layers: [ eqrlayer, projlayer, cyllayer ] });
+          eqr_layer_idx = 0;
+          proj_layer_idx = 1;
+          cyl_layer_idx = 2;
+        }
         finalizeSessionStart(session);
       }
 
@@ -308,9 +321,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         session.requestAnimationFrame(onXRFrame);
 
         if (session.isImmersive && !texture_copied) {
-          eqr_layer = session.renderState.layers[0];
-          proj_layer = session.renderState.layers[1];
-          cyl_layer = session.renderState.layers[2];
+          eqr_layer = session.renderState.layers[eqr_layer_idx];
+          proj_layer = session.renderState.layers[proj_layer_idx];
+          cyl_layer = session.renderState.layers[cyl_layer_idx];
 
           texture_copied = true;
           let fb = gl.createFramebuffer();
