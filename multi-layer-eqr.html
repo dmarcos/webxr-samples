@@ -416,8 +416,17 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           // won't make much visible performance difference, but we're using the
           // more efficient pattern anyway as a way of promoting best practices.
 
-            if (session.isImmersive) {
-              let glLayerw = xrGLFactory.getSubImage(cyl_layer, frame);}
+          if (session.isImmersive) {
+            let glayer = xrGLFactory.getSubImage(cyl_layer, frame);
+            gl.viewport(0, 0, cyl_texture_width, cyl_texture_height);
+            gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
+            gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, glayer.colorTexture, 0);
+
+            gl.disable(gl.SCISSOR_TEST);
+            gl.clearColor(0, 1, 0, 1);
+            gl.clear(gl.COLOR_BUFFER_BIT);
+            stereoUtil.blit(false, cyl_texture, 0, 0, 1, 1, cyl_texture_width, cyl_texture_height);
+          }
           let views = [];
           for (let view of pose.views) {
             let viewport = null;
