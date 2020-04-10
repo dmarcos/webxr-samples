@@ -281,7 +281,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           radius: 10,
           layout: ((stereo_layer.checked) ? "stereo-top-bottom" : "mono")
         });
-        session.updateRenderState({ layers: [ eqrlayer, projlayer, cyllayer ] });
+        session.updateRenderState({ layers: [ eqrlayer, cyllayer, projlayer ] });
 
         finalizeSessionStart(session);
       }
