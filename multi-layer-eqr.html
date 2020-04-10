@@ -244,6 +244,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             cyl_texture = loadTexture(gl, 'media/textures/eilenriede-park-2k.png', (w,h) => {
               cyl_texture_width  = w;
               cyl_texture_height = h;
+              
+              eqr_texture = cyl_texture;
+              eqr_texture_width = cyl_texture_width;
+              eqr_texture_height = eqr_texture_height;
               onImageLoaded(session);
             });
           }
