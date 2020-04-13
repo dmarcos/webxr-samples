@@ -420,6 +420,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         let refSpace = getRefSpace(session, true);
 
         if (session.isImmersive /* && !texture_copied*/) {
+          cyl_layer.referenceSpace = refSpace;
+
           texture_copied = true;
           let fb = gl.createFramebuffer();
           let glayer = xrGLFactory.getSubImage(cyl_layer, frame);
