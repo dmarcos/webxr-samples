@@ -419,7 +419,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         let session = frame.session;
         let refSpace = getRefSpace(session, true);
 
-        if (session.isImmersive && !texture_copied) {
+        if (session.isImmersive /* && !texture_copied*/) {
           texture_copied = true;
           let fb = gl.createFramebuffer();
           let glayer = xrGLFactory.getSubImage(cyl_layer, frame);
