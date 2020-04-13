@@ -244,10 +244,15 @@ export class Scene extends Node {
       return;
     }
 
-    gl.bindFramebuffer(gl.FRAMEBUFFER, layer.framebuffer);
-  //  if (layer.colorTexture) {
-  //    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, layer.colorTexture, 0);
-  //  }
+    if (layer.framebuffer) {
+      gl.bindFramebuffer(gl.FRAMEBUFFER, layer.framebuffer);
+    }
+    if (layer.colorTexture) {
+      gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, layer.colorTexture, 0);
+    }
+    if (layer.depthStencilTexture) {
+      gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, layer.depthStencilTexture, 0);
+    }
 
     if (this.clear) {
       gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
