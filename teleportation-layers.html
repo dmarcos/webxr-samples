@@ -223,7 +223,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           return;
 
           gl = createWebGLContext({
-          xrCompatible: true
+          xrCompatible: true,
+          webgl2: true
         });
         document.body.appendChild(gl.canvas);
 
