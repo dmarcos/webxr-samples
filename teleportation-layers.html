@@ -69,6 +69,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
       // If requested, don't display the frame rate info.
       let hideStats = QueryArgs.getBool('hideStats', false);
+      let stereoUtil = null;
 
       // XR globals. Several additional reference spaces are required because of
       // how the teleportation mechanic in onSelect works.
@@ -246,6 +247,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         // against it onSelect so that we can teleport the user to that
         // particular location.
         addFloorBox();
+
+        stereoUtil = new VRStereoUtil(gl);
       }
 
       function onRequestSession() {
