@@ -304,7 +304,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             //let cyl_layer = session.renderState.layers[cyl_layer_idx];
             cyl_layer.referenceSpace = refSpace;
             let pos = {x: -1.0, y: 0.0, z: -2.0};
-            let orient = {x:0,y:0,z:0,w:1};
+            let orient = quat.create();//{x:0,y:0,z:0,w:1};
+            quat.fromEuler(orient, 60, 30, 0);
+
             cyl_layer.transform = new XRRigidTransform(pos, orient);
           }
           return refSpace;
