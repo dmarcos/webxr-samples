@@ -496,24 +496,26 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         let session = frame.session;
         let refSpace = getRefSpace(session, true);
 
-        if (session.isImmersive && !texture_copied) {
+        if (session.isImmersive) {
           cyl_layer.referenceSpace = refSpace;
 
-          let fb = gl.createFramebuffer();
-          let glayer = xrGLFactory.getSubImage(cyl_layer, frame);
-          //gl.viewport(0, 0, cyl_texture_width, cyl_texture_height);
-          gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
-          gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, glayer.colorTexture, 0);
+          if (!texture_copied) {
+            let fb = gl.createFramebuffer();
+            let glayer = xrGLFactory.getSubImage(cyl_layer, frame);
+            //gl.viewport(0, 0, cyl_texture_width, cyl_texture_height);
+            gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
+            gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, glayer.colorTexture, 0);
 
-          gl.disable(gl.SCISSOR_TEST);
-          gl.clearColor(0, 1, 0, 1);
-          gl.clear(gl.COLOR_BUFFER_BIT);
-          if (cyl_texture_width != 0 && cyl_texture_height != 0) {
-            stereoUtil.blit(false, cyl_texture, 0, 0, 1, 1, cyl_texture_width, cyl_texture_height);
-            texture_copied = true;
-          }        
-          gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-          gl.deleteFramebuffer(fb);
+            gl.disable(gl.SCISSOR_TEST);
+            gl.clearColor(0, 1, 0, 1);
+            gl.clear(gl.COLOR_BUFFER_BIT);
+            if (cyl_texture_width != 0 && cyl_texture_height != 0) {
+              stereoUtil.blit(false, cyl_texture, 0, 0, 1, 1, cyl_texture_width, cyl_texture_height);
+              texture_copied = true;
+            }        
+            gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+            gl.deleteFramebuffer(fb);
+          }
         }
        
         let pose = frame.getViewerPose(refSpace);
