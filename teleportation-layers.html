@@ -90,8 +90,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       let floorPosition = [0, -floorSize / 2 + 0.01, 0];
       let floorNode = null;
       let cyl_texture;
-      let cyl_texture_width;
-      let cyl_texture_height;
+      let cyl_texture_width = 0;
+      let cyl_texture_height = 0;
 
       // WebGL scene globals.
       let xrFramebuffer = null;
@@ -496,10 +496,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         let session = frame.session;
         let refSpace = getRefSpace(session, true);
 
-        if (session.isImmersive /* && !texture_copied*/) {
+        if (session.isImmersive && !texture_copied) {
           cyl_layer.referenceSpace = refSpace;
 
-          texture_copied = true;
           let fb = gl.createFramebuffer();
           let glayer = xrGLFactory.getSubImage(cyl_layer, frame);
           //gl.viewport(0, 0, cyl_texture_width, cyl_texture_height);
@@ -509,8 +508,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           gl.disable(gl.SCISSOR_TEST);
           gl.clearColor(0, 1, 0, 1);
           gl.clear(gl.COLOR_BUFFER_BIT);
-          stereoUtil.blit(false, cyl_texture, 0, 0, 1, 1, cyl_texture_width, cyl_texture_height);
-          
+          if (cyl_texture_width != 0 && cyl_texture_height != 0) {
+            stereoUtil.blit(false, cyl_texture, 0, 0, 1, 1, cyl_texture_width, cyl_texture_height);
+            texture_copied = true;
+          }        
           gl.bindFramebuffer(gl.FRAMEBUFFER, null);
           gl.deleteFramebuffer(fb);
         }
