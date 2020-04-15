@@ -274,6 +274,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
         
         if (session.isImmersive) {
+          texture_copied = false;
           xrFramebuffer = gl.createFramebuffer();
           xrGLFactory = new XRWebGLBinding(session, gl);
           proj_layer = xrGLFactory.createProjectionLayer("texture", {depth:true});
