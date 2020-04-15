@@ -82,6 +82,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       let xrGLFactory = null;
       let proj_layer = null;
       let cyl_layer = null;
+      let quad_layer = null;
       let texture_copied = false;
 
       let trackingSpaceOriginInWorldSpace = vec3.create();
@@ -285,7 +286,15 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             radius: 3,
             layout: "mono"
           });
-          session.updateRenderState({ layers: [ proj_layer, cyl_layer ] });
+          quad_layer = xrGLFactory.createQuadLayer("texture", {
+            pixelWidth: 2048, pixelHeight: 1024, 
+            width: 1,
+            height: 1,
+            layout: "mono"
+          });
+          quad_layer.width = 4;
+          quad_layer.height = 2;
+          session.updateRenderState({ layers: [ proj_layer, cyl_layer, quad_layer ] });
 
           cyl_texture = loadTexture(gl, 'media/textures/eilenriede-park-2k.png', (w,h) => {
             cyl_texture_width  = w;
@@ -307,8 +316,13 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             let pos = {x: -1.0, y: 2.0, z: -2.0};
             let orient = quat.create();//{x:0,y:0,z:0,w:1};
             quat.fromEuler(orient, 60, 30, 0);
-
             cyl_layer.transform = new XRRigidTransform(pos, {x: orient[0], y: orient[1], z: orient[2], w: orient[3]});
+
+            quad_layer.referenceSpace = refSpace;
+            pos = {x: 1.5, y: 1.0, z: -2.0};
+            orient = quat.create();//{x:0,y:0,z:0,w:1};
+            quat.fromEuler(orient, 0, 0, 30);
+            quad_layer.transform = new XRRigidTransform(pos, {x: orient[0], y: orient[1], z: orient[2], w: orient[3]});
           }
           return refSpace;
         }, (e) => {
@@ -499,6 +513,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
         if (session.isImmersive) {
           cyl_layer.referenceSpace = refSpace;
+          quad_layer.referenceSpace = refSpace;
 
           if (!texture_copied) {
             let fb = gl.createFramebuffer();
@@ -512,8 +527,19 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             gl.clear(gl.COLOR_BUFFER_BIT);
             if (cyl_texture_width != 0 && cyl_texture_height != 0) {
               stereoUtil.blit(false, cyl_texture, 0, 0, 1, 1, cyl_texture_width, cyl_texture_height);
+            }        
+
+            glayer = xrGLFactory.getSubImage(quad_layer, frame);  
+            gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, glayer.colorTexture, 0);
+
+            gl.disable(gl.SCISSOR_TEST);
+            gl.clearColor(0.1, 1, 0.5, 1);
+            gl.clear(gl.COLOR_BUFFER_BIT);
+            if (cyl_texture_width != 0 && cyl_texture_height != 0) {
+              stereoUtil.blit(false, cyl_texture, 0, 0, 1, 1, cyl_texture_width, cyl_texture_height);
               texture_copied = true;
             }        
+
             gl.bindFramebuffer(gl.FRAMEBUFFER, null);
             gl.deleteFramebuffer(fb);
           }
