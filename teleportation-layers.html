@@ -556,13 +556,13 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
               // position the cylinder layer
               //let cyl_layer = session.renderState.layers[cyl_layer_idx];
-              cyl_layer.referenceSpace = refSpace;
+              cyl_layer.space = refSpace;
               let pos = {x: -1.0, y: 2.0, z: -2.0};
               let orient = quat.create();//{x:0,y:0,z:0,w:1};
               quat.fromEuler(orient, 60, 30, 0);
               cyl_layer.transform = new XRRigidTransform(pos, {x: orient[0], y: orient[1], z: orient[2], w: orient[3]});
 
-              quad_layer.referenceSpace = refSpace;
+              quad_layer.space = refSpace;
               pos = {x: 1.5, y: 1.0, z: -2.0};
               orient = quat.create();//{x:0,y:0,z:0,w:1};
               quat.fromEuler(orient, 0, 0, 30);
@@ -571,8 +571,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           }
                     
           if (cyl_layer) {
-            cyl_layer.referenceSpace = refSpace;
-            quad_layer.referenceSpace = refSpace;
+            cyl_layer.space = refSpace;
+            quad_layer.space = refSpace;
             if (!texture_copied) {
               let fb = gl.createFramebuffer();
               let glayer = xrGLFactory.getSubImage(cyl_layer, frame);
