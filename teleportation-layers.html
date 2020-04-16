@@ -279,6 +279,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         if (session.isImmersive) {
           texture_copied = false;
           cyl_layer = null;
+          cyl_texture = null;
           xrFramebuffer = gl.createFramebuffer();
           xrGLFactory = new XRWebGLBinding(session, gl);
           proj_layer = xrGLFactory.createProjectionLayer("texture", {depth:true});
@@ -304,20 +305,18 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           session.updateRenderState({ layers: [ proj_layer, cyl_layer, quad_layer ] });
           */
           session.updateRenderState({ layers: [ proj_layer ] });
-          if (!cyl_texture) {
-            if (!stereo_layer.checked) {
-              cyl_texture = loadTexture(gl, 'media/textures/eilenriede-park-2k.png', (w,h) => {
-                cyl_texture_width  = w;
-                cyl_texture_height = h;
-                //onImageLoaded(session);
-              });
-            } else {
-              cyl_texture = loadTexture(gl, 'media/textures/stereo-top-bottom-image.png', (w,h) => {
-                cyl_texture_width  = w;
-                cyl_texture_height = h;
-                //onImageLoaded(session);
-              });
-            }
+          if (!stereo_layer.checked) {
+            cyl_texture = loadTexture(gl, 'media/textures/eilenriede-park-2k.png', (w,h) => {
+              cyl_texture_width  = w;
+              cyl_texture_height = h;
+              //onImageLoaded(session);
+            });
+          } else {
+            cyl_texture = loadTexture(gl, 'media/textures/stereo-top-bottom-image.png', (w,h) => {
+              cyl_texture_width  = w;
+              cyl_texture_height = h;
+              //onImageLoaded(session);
+            });
           }
         } else {
           let glLayer = new XRWebGLLayer(session, gl);
@@ -501,6 +500,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       function onSessionEnded(event) {
         if (event.session.isImmersive) {
           xrButton.setSession(null);
+          if (cyl_texture) {
+            gl.deleteTexture(cyl_texture);
+            cyl_texture = null;
+          }
         }
       }
 
