@@ -304,7 +304,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           session.updateRenderState({ layers: [ proj_layer, cyl_layer, quad_layer ] });
           */
           session.updateRenderState({ layers: [ proj_layer ] });
-          if (stereo_layer) {
+          if (!stereo_layer) {
             cyl_texture = loadTexture(gl, 'media/textures/eilenriede-park-2k.png', (w,h) => {
               cyl_texture_width  = w;
               cyl_texture_height = h;
