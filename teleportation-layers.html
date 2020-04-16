@@ -92,7 +92,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       let floorSize = 10;
       let floorPosition = [0, -floorSize / 2 + 0.01, 0];
       let floorNode = null;
-      let cyl_texture;
+      let cyl_texture = null;
       let cyl_texture_width = 0;
       let cyl_texture_height = 0;
 
@@ -304,18 +304,20 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           session.updateRenderState({ layers: [ proj_layer, cyl_layer, quad_layer ] });
           */
           session.updateRenderState({ layers: [ proj_layer ] });
-          if (!stereo_layer.checked) {
-            cyl_texture = loadTexture(gl, 'media/textures/eilenriede-park-2k.png', (w,h) => {
-              cyl_texture_width  = w;
-              cyl_texture_height = h;
-              //onImageLoaded(session);
-            });
-          } else {
-            cyl_texture = loadTexture(gl, 'media/textures/stereo-top-bottom-image.png', (w,h) => {
-              cyl_texture_width  = w;
-              cyl_texture_height = h;
-              //onImageLoaded(session);
-            });
+          if (!cyl_texture) {
+            if (!stereo_layer.checked) {
+              cyl_texture = loadTexture(gl, 'media/textures/eilenriede-park-2k.png', (w,h) => {
+                cyl_texture_width  = w;
+                cyl_texture_height = h;
+                //onImageLoaded(session);
+              });
+            } else {
+              cyl_texture = loadTexture(gl, 'media/textures/stereo-top-bottom-image.png', (w,h) => {
+                cyl_texture_width  = w;
+                cyl_texture_height = h;
+                //onImageLoaded(session);
+              });
+            }
           }
         } else {
           let glLayer = new XRWebGLLayer(session, gl);
