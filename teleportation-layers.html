@@ -46,6 +46,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           viewer orientation.
           <a class="back" href="./index.html">Back</a>
         </p>
+        <input type="checkbox" id="stereo_layer">stereo layer</input>
       </details>
     </header>
     <script type="module">
@@ -70,6 +71,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       // If requested, don't display the frame rate info.
       let hideStats = QueryArgs.getBool('hideStats', false);
       let stereoUtil = null;
+      let stereo_layer = document.getElementById("stereo_layer").checked;
 
       // XR globals. Several additional reference spaces are required because of
       // how the teleportation mechanic in onSelect works.
@@ -284,24 +286,34 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             centralAngle: 120,
             aspectRatio: 2,
             radius: 3,
-            layout: "mono"
+            layout: ((stereo_layer)?"stereo-top-bottom":"mono")
           });
+          cyl_layer.centralAngle = 120;
+          cyl_layer.aspectRatio = 2;
+          cyl_layer.radius = 3;
           quad_layer = xrGLFactory.createQuadLayer("texture", {
             pixelWidth: 2048, pixelHeight: 1024, 
             width: 1,
             height: 1,
-            layout: "mono"
+            layout: ((stereo_layer)?"stereo-top-bottom":"mono")
           });
           quad_layer.width = 4;
           quad_layer.height = 2;
           session.updateRenderState({ layers: [ proj_layer, cyl_layer, quad_layer ] });
 
-          cyl_texture = loadTexture(gl, 'media/textures/eilenriede-park-2k.png', (w,h) => {
-            cyl_texture_width  = w;
-            cyl_texture_height = h;
-            //onImageLoaded(session);
-          });
-        
+          if (stereo_layer) {
+            cyl_texture = loadTexture(gl, 'media/textures/eilenriede-park-2k.png', (w,h) => {
+              cyl_texture_width  = w;
+              cyl_texture_height = h;
+              //onImageLoaded(session);
+            });
+          } else {
+            cyl_texture = loadTexture(gl, 'media/textures/stereo-top-bottom-image.png', (w,h) => {
+              cyl_texture_width  = w;
+              cyl_texture_height = h;
+              //onImageLoaded(session);
+            });
+          }
         } else {
           let glLayer = new XRWebGLLayer(session, gl);
           session.updateRenderState({ baseLayer: glLayer });
