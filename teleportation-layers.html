@@ -567,34 +567,34 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           if (cyl_layer) {
             cyl_layer.referenceSpace = refSpace;
             quad_layer.referenceSpace = refSpace;
-          }
-          if (!texture_copied) {
-            let fb = gl.createFramebuffer();
-            let glayer = xrGLFactory.getSubImage(cyl_layer, frame);
-            //gl.viewport(0, 0, cyl_texture_width, cyl_texture_height);
-            gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
-            gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, glayer.colorTexture, 0);
+            if (!texture_copied) {
+              let fb = gl.createFramebuffer();
+              let glayer = xrGLFactory.getSubImage(cyl_layer, frame);
+              //gl.viewport(0, 0, cyl_texture_width, cyl_texture_height);
+              gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
+              gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, glayer.colorTexture, 0);
 
-            gl.disable(gl.SCISSOR_TEST);
-            gl.clearColor(0, 1, 0, 1);
-            gl.clear(gl.COLOR_BUFFER_BIT);
-            if (cyl_texture_width != 0 && cyl_texture_height != 0) {
-              stereoUtil.blit(false, cyl_texture, 0, 0, 1, 1, cyl_texture_width, cyl_texture_height);
-            }        
+              gl.disable(gl.SCISSOR_TEST);
+              gl.clearColor(0, 1, 0, 1);
+              gl.clear(gl.COLOR_BUFFER_BIT);
+              if (cyl_texture_width != 0 && cyl_texture_height != 0) {
+                stereoUtil.blit(false, cyl_texture, 0, 0, 1, 1, cyl_texture_width, cyl_texture_height);
+              }        
 
-            glayer = xrGLFactory.getSubImage(quad_layer, frame);  
-            gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, glayer.colorTexture, 0);
+              glayer = xrGLFactory.getSubImage(quad_layer, frame);  
+              gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, glayer.colorTexture, 0);
 
-            gl.disable(gl.SCISSOR_TEST);
-            gl.clearColor(0.1, 1, 0.5, 1);
-            gl.clear(gl.COLOR_BUFFER_BIT);
-            if (cyl_texture_width != 0 && cyl_texture_height != 0) {
-              stereoUtil.blit(false, cyl_texture, 0, 0, 1, 1, cyl_texture_width, cyl_texture_height);
-              texture_copied = true;
-            }        
+              gl.disable(gl.SCISSOR_TEST);
+              gl.clearColor(0.1, 1, 0.5, 1);
+              gl.clear(gl.COLOR_BUFFER_BIT);
+              if (cyl_texture_width != 0 && cyl_texture_height != 0) {
+                stereoUtil.blit(false, cyl_texture, 0, 0, 1, 1, cyl_texture_width, cyl_texture_height);
+                texture_copied = true;
+              }        
 
-            gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-            gl.deleteFramebuffer(fb);
+              gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+              gl.deleteFramebuffer(fb);
+            }
           }
         }
        
