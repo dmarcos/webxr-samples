@@ -71,7 +71,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       // If requested, don't display the frame rate info.
       let hideStats = QueryArgs.getBool('hideStats', false);
       let stereoUtil = null;
-      let stereo_layer = document.getElementById("stereo_layer").checked;
+      let stereo_layer = document.getElementById("stereo_layer");
 
       // XR globals. Several additional reference spaces are required because of
       // how the teleportation mechanic in onSelect works.
@@ -304,7 +304,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           session.updateRenderState({ layers: [ proj_layer, cyl_layer, quad_layer ] });
           */
           session.updateRenderState({ layers: [ proj_layer ] });
-          if (!stereo_layer) {
+          if (!stereo_layer.checked) {
             cyl_texture = loadTexture(gl, 'media/textures/eilenriede-park-2k.png', (w,h) => {
               cyl_texture_width  = w;
               cyl_texture_height = h;
@@ -533,16 +533,16 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             if (cyl_texture_width != 0 && cyl_texture_height != 0) {
               cyl_layer = xrGLFactory.createCylinderLayer("texture", {
                 pixelWidth: cyl_texture_width,
-                pixelHeight: cyl_texture_height / ((stereo_layer)?2:1), 
-                layout: ((stereo_layer)?"stereo-top-bottom":"mono")
+                pixelHeight: cyl_texture_height / ((stereo_layer.checked)?2:1), 
+                layout: ((stereo_layer.checked)?"stereo-top-bottom":"mono")
               });
               cyl_layer.centralAngle = 60;
               cyl_layer.aspectRatio = 2;
               cyl_layer.radius = 3;
               quad_layer = xrGLFactory.createQuadLayer("texture", {
                 pixelWidth: cyl_texture_width,
-                pixelHeight: cyl_texture_height / ((stereo_layer)?2:1), 
-                layout: ((stereo_layer)?"stereo-top-bottom":"mono")
+                pixelHeight: cyl_texture_height / ((stereo_layer.checked)?2:1), 
+                layout: ((stereo_layer.checked)?"stereo-top-bottom":"mono")
               });
               quad_layer.width = 4;
               quad_layer.height = 2;
