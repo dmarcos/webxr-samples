@@ -325,6 +325,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         session.requestReferenceSpace('local-floor').then((refSpace) => {
           console.log("created local-floor reference space");
           if (session.isImmersive) {
+          /*
             // position the cylinder layer
             //let cyl_layer = session.renderState.layers[cyl_layer_idx];
             cyl_layer.referenceSpace = refSpace;
@@ -338,6 +339,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             orient = quat.create();//{x:0,y:0,z:0,w:1};
             quat.fromEuler(orient, 0, 0, 30);
             quad_layer.transform = new XRRigidTransform(pos, {x: orient[0], y: orient[1], z: orient[2], w: orient[3]});
+          */
           }
           return refSpace;
         }, (e) => {
@@ -545,6 +547,20 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
               quad_layer.width = 4;
               quad_layer.height = 2;
               session.updateRenderState({ layers: [ proj_layer, cyl_layer, quad_layer ] });
+
+              // position the cylinder layer
+              //let cyl_layer = session.renderState.layers[cyl_layer_idx];
+              cyl_layer.referenceSpace = refSpace;
+              let pos = {x: -1.0, y: 2.0, z: -2.0};
+              let orient = quat.create();//{x:0,y:0,z:0,w:1};
+              quat.fromEuler(orient, 60, 30, 0);
+              cyl_layer.transform = new XRRigidTransform(pos, {x: orient[0], y: orient[1], z: orient[2], w: orient[3]});
+
+              quad_layer.referenceSpace = refSpace;
+              pos = {x: 1.5, y: 1.0, z: -2.0};
+              orient = quat.create();//{x:0,y:0,z:0,w:1};
+              quat.fromEuler(orient, 0, 0, 30);
+              quad_layer.transform = new XRRigidTransform(pos, {x: orient[0], y: orient[1], z: orient[2], w: orient[3]});
             }
           }
                     
