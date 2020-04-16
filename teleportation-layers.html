@@ -278,10 +278,12 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         
         if (session.isImmersive) {
           texture_copied = false;
+          cyl_layer = null;
           xrFramebuffer = gl.createFramebuffer();
           xrGLFactory = new XRWebGLBinding(session, gl);
           proj_layer = xrGLFactory.createProjectionLayer("texture", {depth:true});
-          cyl_layer = xrGLFactory.createCylinderLayer("texture", {
+
+          /*cyl_layer = xrGLFactory.createCylinderLayer("texture", {
             pixelWidth: 2048, pixelHeight: 1024, 
             centralAngle: 120,
             aspectRatio: 2,
@@ -300,7 +302,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           quad_layer.width = 4;
           quad_layer.height = 2;
           session.updateRenderState({ layers: [ proj_layer, cyl_layer, quad_layer ] });
-
+          */
+          session.updateRenderState({ layers: [ proj_layer ] });
           if (stereo_layer) {
             cyl_texture = loadTexture(gl, 'media/textures/eilenriede-park-2k.png', (w,h) => {
               cyl_texture_width  = w;
@@ -524,6 +527,27 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         let refSpace = getRefSpace(session, true);
 
         if (session.isImmersive) {
+          if (!cyl_layer) {
+            if (cyl_texture_width != 0 && cyl_texture_height != 0) {
+              cyl_layer = xrGLFactory.createCylinderLayer("texture", {
+                pixelWidth: cyl_texture_width,
+                pixelHeight: cyl_texture_height / ((stereo_layer)?2:1), 
+                layout: ((stereo_layer)?"stereo-top-bottom":"mono")
+              });
+              cyl_layer.centralAngle = 120;
+              cyl_layer.aspectRatio = 1;
+              cyl_layer.radius = 3;
+              quad_layer = xrGLFactory.createQuadLayer("texture", {
+                pixelWidth: cyl_texture_width,
+                pixelHeight: cyl_texture_height / ((stereo_layer)?2:1), 
+                layout: ((stereo_layer)?"stereo-top-bottom":"mono")
+              });
+              quad_layer.width = 4;
+              quad_layer.height = 2;
+              session.updateRenderState({ layers: [ proj_layer, cyl_layer, quad_layer ] });
+            }
+          }
+                    
           cyl_layer.referenceSpace = refSpace;
           quad_layer.referenceSpace = refSpace;
 
