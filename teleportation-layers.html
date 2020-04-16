@@ -548,9 +548,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             }
           }
                     
-          cyl_layer.referenceSpace = refSpace;
-          quad_layer.referenceSpace = refSpace;
-
+          if (cyl_layer) {
+            cyl_layer.referenceSpace = refSpace;
+            quad_layer.referenceSpace = refSpace;
+          }
           if (!texture_copied) {
             let fb = gl.createFramebuffer();
             let glayer = xrGLFactory.getSubImage(cyl_layer, frame);
