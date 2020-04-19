@@ -523,7 +523,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
                 layout: ((stereo_layer.checked)?"stereo-top-bottom":"mono")
               });
               cyl_layer.centralAngle = 60;
-              cyl_layer.aspectRatio = cyl_layer.pixelWidth/(cyl_layer.pixelHeight / ((stereo_layer.checked) : 2 : 1));
+              cyl_layer.aspectRatio = cyl_layer.pixelWidth/(cyl_layer.pixelHeight / ((stereo_layer.checked) ? 2 : 1));
               cyl_layer.radius = 2;
               quad_layer = xrGLFactory.createQuadLayer("texture", {
                 pixelWidth: cyl_texture_width,
