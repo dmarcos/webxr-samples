@@ -83,21 +83,17 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       let renderer = null;
       let scene = new Scene();
       scene.addNode(new CubeSeaNode({cubeCount: 5, halfOnly:true, autoRotate:false}));
-      let eqr_texture;
-      let eqr_texture_width;
-      let eqr_texture_height;
-      let eqr_layer = null;
+      let cube_layer = null;
       let proj_layer = null;
       let cyl_texture;
       let cyl_texture_width;
       let cyl_texture_height;
       let cyl_layer = null;
-      let eqr_layer_idx = 0;
       let proj_layer_idx = 1;
       let cyl_layer_idx = 2;
 
       let cubeMapTexture = null;
-      
+      let cube_face_size = 0;
       
       function initXR() {
         xrButton = new WebXRButton({
@@ -171,7 +167,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           }
           complete_callback(image.width, image.height);
         };
-        eqr_texture_width = eqr_texture_height = undefined;
         image.src = url;
       }
 
@@ -202,13 +197,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
         stereoUtil = new VRStereoUtil(gl);
 
-        let img2 = document.createElement('img'); // Use DOM HTMLImageElement
-        img2.src = 'media/textures/mono_cube_map.png';
-        img2.alt = 'alt text';
-        img2.onload = function() {
-          cubeMapTexture = copyCubestripToGLBuffer(img2);
-        }
-        document.body.appendChild(img2);
       }
 
       function __getNewGLTexObj(glTexVariable) {
@@ -261,6 +249,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
         // our target cube face size.
         const cubeFaceSize = _getCubeTextureSize(sourceImageElement);
+        cube_face_size = cubeFaceSize;
         //this._updateMaxGPUMemUsed(cubeFaceSize);
 
         // the input texture cube face size.
@@ -343,28 +332,27 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         session.addEventListener('end', onSessionEnded);
         session.addEventListener('visibilitychange', onVisibilityChange);
 
+        number_of_images = 2;
         initGL();
 
         if (session.isImmersive) {
+          let img2 = document.createElement('img'); // Use DOM HTMLImageElement
+          img2.src = 'media/textures/mono_cube_map.png';
+          img2.alt = 'alt text';
+          img2.onload = function() {
+            cubeMapTexture = copyCubestripToGLBuffer(img2);
+            onImageLoaded(session);
+          }
+          //document.body.appendChild(img2);
+
+
           if (stereo_layer.checked) {
-            number_of_images = 2;
-            eqr_texture = loadTexture(gl, 'media/textures/chess-pano-4k.jpg', (w,h) => {
-              eqr_texture_width  = w;
-              eqr_texture_height = h;
-              onImageLoaded(session);
-            });
             cyl_texture = loadTexture(gl, 'media/textures/stereo-top-bottom-image.png', (w,h) => {
               cyl_texture_width  = w;
               cyl_texture_height = h;
               onImageLoaded(session);
             });
           } else {
-            number_of_images = 2;
-            eqr_texture = loadTexture(gl, 'media/textures/mono_equirect_test.png', (w, h) => {
-              eqr_texture_width  = w;
-              eqr_texture_height = h;
-              onImageLoaded(session);
-            });
             cyl_texture = loadTexture(gl, 'media/textures/eilenriede-park-2k.png', (w,h) => {
               cyl_texture_width  = w;
               cyl_texture_height = h;
@@ -404,11 +392,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           return;
         xrFramebuffer = gl.createFramebuffer();
         xrGLFactory = new XRWebGLBinding(session, gl);
-        let projlayer = xrGLFactory.createProjectionLayer("texture", {stencil: do_stencil_buffer.checked});
-        let eqrlayer = xrGLFactory.createEquirectLayer("texture", {
-          pixelWidth: eqr_texture_width, 
-          pixelHeight: eqr_texture_height, // / (stereo_layer.checked ? 2 : 1), 
-          layout: ((stereo_layer.checked) ? "stereo-top-bottom" : "mono")
+        proj_layer = xrGLFactory.createProjectionLayer("texture", {stencil: do_stencil_buffer.checked});
+        cube_layer = xrGLFactory.createCubeLayer("texture", {
+          pixelWidth: cube_face_size, 
+          pixelHeight: cube_face_size, // / (stereo_layer.checked ? 2 : 1), 
+          layout: ((stereo_layer.checked) ? "stereo" : "mono")
         });
         cyl_layer = xrGLFactory.createCylinderLayer("texture", {
           pixelWidth: cyl_texture_width, 
@@ -419,13 +407,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           layout: ((stereo_layer.checked) ? "stereo-top-bottom" : "mono")
         });
         if (change_order.checked) {
-          session.updateRenderState({ layers: [ eqrlayer, cyl_layer, projlayer ] });
-          eqr_layer_idx = 0;
+          session.updateRenderState({ layers: [ cube_layer, cyl_layer, proj_layer ] });
           cyl_layer_idx = 1;
           proj_layer_idx = 2;
         } else {
-          session.updateRenderState({ layers: [ eqrlayer, projlayer, cyl_layer ] });
-          eqr_layer_idx = 0;
+          session.updateRenderState({ layers: [ cube_layer, proj_layer, cyl_layer ] });
           proj_layer_idx = 1;
           cyl_layer_idx = 2;
         }
@@ -458,13 +444,14 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         session.requestAnimationFrame(onXRFrame);
 
         if (session.isImmersive && !texture_copied) {
-          eqr_layer = session.renderState.layers[eqr_layer_idx];
-          proj_layer = session.renderState.layers[proj_layer_idx];
-          cyl_layer = session.renderState.layers[cyl_layer_idx];
+          //eqr_layer = session.renderState.layers[eqr_layer_idx];
+          //proj_layer = session.renderState.layers[proj_layer_idx];
+          //cyl_layer = session.renderState.layers[cyl_layer_idx];
 
           texture_copied = true;
           let fb = gl.createFramebuffer();
           let glayer;
+          /*
           //if (stereo_layer.checked) {
             //TODO!
             //glayer = xrGLFactory.getViewSubImage(session.renderState.layers[0], view);
@@ -480,7 +467,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           gl.clearColor(1, 0, 0, 1);
           gl.clear(gl.COLOR_BUFFER_BIT);
           stereoUtil.blit(false, eqr_texture, 0, 0, 1, 1, eqr_texture_width, eqr_texture_height);
-          
+                            */
           glayer = xrGLFactory.getSubImage(cyl_layer, frame);
           gl.viewport(0, 0, cyl_texture_width, cyl_texture_height);
           gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
@@ -494,9 +481,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           gl.bindFramebuffer(gl.FRAMEBUFFER, null);
           gl.deleteFramebuffer(fb);
 
-          gl.deleteTexture(eqr_texture);
+          //gl.deleteTexture(eqr_texture);
           gl.deleteTexture(cyl_texture);
-          eqr_texture = cyl_texture = null;
+          cyl_texture = null;
         }
         if (!session.isImmersive) {
           gl.clearColor(0.1, 0.2, 0.3, 1.0);
