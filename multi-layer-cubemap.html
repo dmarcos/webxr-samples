@@ -262,7 +262,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         //this._updateMaxGPUMemUsed(cubeFaceSize);
 
         // the input texture cube face size.
-        const textureSourceCubeFaceSize = source.naturalWidth;
+        const textureSourceCubeFaceSize = sourceImageElement.naturalWidth;
 
         // dont flip the pixels as we load them into the texture buffer.
         // TEXTURE_CUBE_MAP expects the Y to be flipped for the faces and it already
@@ -283,7 +283,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           // canvas but also could resized the image if our cube face size is
           // smaller than the source image due to GL max texture size.
           tempCanvasContext.drawImage(
-            source,
+            sourceImageElement,
             0, // top left x coord in source
             i * textureSourceCubeFaceSize, // top left y coord in source
             textureSourceCubeFaceSize, // x pixel count from source
