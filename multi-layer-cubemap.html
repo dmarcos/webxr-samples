@@ -247,9 +247,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       function _getCubeTextureSize(imageElement) {
         // We'll use the minimum of our system-imposed max cube map size and the
         // size of an edge of a cube in our texture source image.
-        var glLimit = gl.getParameter(gl.MAX_CUBE_MAP_TEXTURE_SIZE);
-        var texSourceWidth = imageElement.width;
-        return Math.min(glLimit, texSourceWidth);
+        const glLimit = gl.getParameter(gl.MAX_CUBE_MAP_TEXTURE_SIZE);
+        const texSourceWidth = imageElement.width;
+        const texSourceHeight = imageElement.height;
+        return Math.min(glLimit, Math.min(texSourceWidth, texSourceHeight));
       }
 
       // This is a fairly expensive operation, since it involves slicing out
@@ -263,7 +264,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         //this._updateMaxGPUMemUsed(cubeFaceSize);
 
         // the input texture cube face size.
-        const textureSourceCubeFaceSize = sourceImageElement.height;
+        const textureSourceCubeFaceSize = Math.min(sourceImageElement.width, sourceImageElement.height);
 
         // dont flip the pixels as we load them into the texture buffer.
         // TEXTURE_CUBE_MAP expects the Y to be flipped for the faces and it already
