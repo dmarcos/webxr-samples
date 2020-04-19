@@ -275,10 +275,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         let cubefaceTextures = [];
 
         for (let i = 0; i < 6; i++) {
-          const tempCanvas = DOM.create('canvas', {
-            width: cubeFaceSize,
-            height: cubeFaceSize,
-          });
+          let tempCanvas = document.createElement("CANVAS");
+          tempCanvas.width = tempCanvas.height = cubeFaceSize;
           const tempCanvasContext = tempCanvas.getContext('2d');
           // Note that this call to drawImage will not only copy the bytes to the
           // canvas but also could resized the image if our cube face size is
