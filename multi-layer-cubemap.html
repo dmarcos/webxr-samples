@@ -247,7 +247,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         // We'll use the minimum of our system-imposed max cube map size and the
         // size of an edge of a cube in our texture source image.
         var glLimit = gl.getParameter(gl.MAX_CUBE_MAP_TEXTURE_SIZE);
-        var texSourceWidth = ImageElement.width;
+        var texSourceWidth = imageElement.width;
         return Math.min(glLimit, texSourceWidth);
       }
 
