@@ -97,10 +97,14 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       let cyl_layer_idx = 2;
 
       let cubeMapTexture = null;
-      
+
+      let cubeMapImgReady = false; 
       let img2 = document.createElement('img'); // Use DOM HTMLImageElement
       img2.src = 'media/textures/mono_cube_map.png';
       img2.alt = 'alt text';
+      img2.onload = function() {
+        cubeMapImgReady = true;
+      }
       document.body.appendChild(img2);
       
       
@@ -206,8 +210,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         scene.setRenderer(renderer);
 
         stereoUtil = new VRStereoUtil(gl);
-
-        cubeMapTexture = copyCubestripToGLBuffer(img2);
       }
 
       function __getNewGLTexObj(glTexVariable) {
@@ -443,6 +445,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       }
 
       function onXRFrame(t, frame) {
+        if (cubeMapImgReady) {
+          cubeMapTexture = copyCubestripToGLBuffer(img2);
+        }
+
         let session = frame.session;
         let refSpace = session.isImmersive ?
                          xrImmersiveRefSpace :
