@@ -337,6 +337,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           img2.src = 'media/textures/mono_cube_map.png';
           img2.alt = 'alt text';
           img2.onload = function() {
+            cube_face_size = _getCubeTextureSize(img2);
             cube_map_image = img2;
             onImageLoaded(session);
           }
