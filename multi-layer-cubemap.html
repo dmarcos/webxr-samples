@@ -76,6 +76,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       let texture_copied = false;
       let stereoUtil = null;
       let number_of_images = 0;
+      let cube_map_image = null;
 
       // WebGL scene globals.
       let stereo_layer = document.getElementById("stereo_layer");
@@ -244,8 +245,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       // This is a fairly expensive operation, since it involves slicing out
       // pieces of the texure jpeg and potentially resizing them, but it only
       // happens once on the initial render for a photo.
-      function copyCubestripToGLBuffer(sourceImageElement) {
-        const tex = __getNewGLTexObj(gl.TEXTURE_CUBE_MAP);
+      function copyCubestripToGLBuffer(tex, sourceImageElement) {
+        //const tex = __getNewGLTexObj(gl.TEXTURE_CUBE_MAP);
 
         // our target cube face size.
         const cubeFaceSize = _getCubeTextureSize(sourceImageElement);
@@ -304,12 +305,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         }
 
         gl.bindTexture(gl.TEXTURE_CUBE_MAP, null);
-
-        return tex;
       }
-
-
-
 
       function onRequestSession() {
         return navigator.xr.requestSession('immersive-vr',{
@@ -336,11 +332,12 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         initGL();
 
         if (session.isImmersive) {
+          cube_map_image = null;
           let img2 = document.createElement('img'); // Use DOM HTMLImageElement
           img2.src = 'media/textures/mono_cube_map.png';
           img2.alt = 'alt text';
           img2.onload = function() {
-            cubeMapTexture = copyCubestripToGLBuffer(img2);
+            cube_map_image = img2;
             onImageLoaded(session);
           }
           //document.body.appendChild(img2);
@@ -451,6 +448,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           texture_copied = true;
           let fb = gl.createFramebuffer();
           let glayer;
+
+          glayer = xrGLFactory.getSubImage(cube_layer, frame);
+          copyCubestripToGLBuffer(glayer.colorTexture, cube_map_image);
+          
+          
           /*
           //if (stereo_layer.checked) {
             //TODO!
