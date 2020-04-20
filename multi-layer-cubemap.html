@@ -36,7 +36,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
   <body>
     <header>
       <details open>
-        <summary>Multilayer Equirect</summary>
+        <summary>Multilayer Cubemap</summary>
         <p>
           This sample shows how to draw a scene into a projection layer.
           <a class="back" href="./">Back</a>
@@ -393,7 +393,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         xrFramebuffer = gl.createFramebuffer();
         xrGLFactory = new XRWebGLBinding(session, gl);
         proj_layer = xrGLFactory.createProjectionLayer("texture", {stencil: do_stencil_buffer.checked});
-        cube_layer = xrGLFactory.createCubeLayer("texture", {
+        cube_layer = xrGLFactory.createCubeLayer({
           pixelWidth: cube_face_size, 
           pixelHeight: cube_face_size, // / (stereo_layer.checked ? 2 : 1), 
           layout: ((stereo_layer.checked) ? "stereo" : "mono")
