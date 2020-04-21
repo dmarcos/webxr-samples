@@ -44,7 +44,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         <input type="checkbox" id="do_stencil_buffer">stencil buffer</input>
         <input type="checkbox" id="stereo_layer" value="Bike">stereo equirect layer</input>
         <input type="checkbox" id="change_order">change order</input>
-        <input type="checkbox" id="update_cylinder_every_frame">Update cyl every frm</input>
+        <input type="checkbox" id="update_pose_every_frame">Update pose every frm</input>
       </details>
     </header>
     <script type="module">
@@ -64,6 +64,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
       // XR globals.
+      let frame_id = 0;
       let do_stencil_buffer = document.getElementById('do_stencil_buffer');
       let xrButton = null;
       let xrImmersiveRefSpace = null;
@@ -427,6 +428,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       }
 
       function onXRFrame(t, frame) {
+        ++frame_id; 
 //        if (cubeMapImgReady) {
   //        cubeMapTexture = copyCubestripToGLBuffer(img2);
     //    }
@@ -550,20 +552,12 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           // more efficient pattern anyway as a way of promoting best practices.
 
           // Updating cylinder layer every frame
-          if (update_cylinder_every_frame.checked && session.isImmersive) {
-            let glayer = xrGLFactory.getSubImage(cyl_layer, frame);
-            let fb = gl.createFramebuffer();
-            gl.viewport(0, 0, cyl_texture_width, cyl_texture_height);
-            gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
-            gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, glayer.colorTexture, 0);
-
-            gl.disable(gl.SCISSOR_TEST);
-            gl.clearColor(0, 1, 0, 1);
-            gl.clear(gl.COLOR_BUFFER_BIT);
-            stereoUtil.blit(false, cyl_texture, 0, 0, 1, 1, cyl_texture_width, cyl_texture_height);
-
-            gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-            gl.deleteFramebuffer(fb);
+          if (update_pose_every_frame.checked && session.isImmersive) {
+            cube_layer.space = refSpace;
+            pos = {x: 0.0, y: 0.0, z: 0.0};
+            orient = quat.create();//{x:0,y:0,z:0,w:1};
+            quat.fromEuler(orient, 0, 0.1*frame_id, 0);
+            quad_layer.orientation = {x: orient[0], y: orient[1], z: orient[2], w: orient[3]};
           }
           let views = [];
           for (let view of pose.views) {
