@@ -553,11 +553,14 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           // more efficient pattern anyway as a way of promoting best practices.
 
           // Updating cylinder layer every frame
-          if (update_pose_every_frame.checked && session.isImmersive) {
+          if (session.isImmersive) {
             cube_layer.space = refSpace;
-            let orient = quat.create();//{x:0,y:0,z:0,w:1};
-            quat.fromEuler(orient, 0, 0.1*frame_id, 0);
-            cube_layer.orientation = new DOMPointReadOnly(orient[0], orient[1], orient[2], orient[3]);
+
+            if (update_pose_every_frame.checked) {
+              let orient = quat.create();//{x:0,y:0,z:0,w:1};
+              quat.fromEuler(orient, 0, 0.1*frame_id, 0);
+              cube_layer.orientation = new DOMPointReadOnly(orient[0], orient[1], orient[2], orient[3]);
+            }
           }
           let views = [];
           for (let view of pose.views) {
