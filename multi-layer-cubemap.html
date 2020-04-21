@@ -555,7 +555,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           // Updating cylinder layer every frame
           if (update_pose_every_frame.checked && session.isImmersive) {
             cube_layer.space = refSpace;
-            orient = quat.create();//{x:0,y:0,z:0,w:1};
+            let orient = quat.create();//{x:0,y:0,z:0,w:1};
             quat.fromEuler(orient, 0, 0.1*frame_id, 0);
             quad_layer.orientation = {x: orient[0], y: orient[1], z: orient[2], w: orient[3]};
           }
