@@ -561,7 +561,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
               cube_layer.orientation = new DOMPointReadOnly(orient[0], orient[1], orient[2], orient[3]);
             }
           }
-          gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
           let views = [];
           for (let view of pose.views) {
             let viewport = null;
@@ -582,6 +581,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             } else {
               viewport = glLayer.getViewport(view);
             }
+            gl.enable(gl.SCISSOR_TEST);
+            gl.scissor(viewport.x, viewport.x, viewport.width, viewport.height); 
+            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+            gl.disable(gl.SCISSOR_TEST);
             // Gather all the values needed for one view and push it into the
             // array of views to be drawn. WebXRView is a utility class that
             // holds all the necessary values for drawing a single view.
