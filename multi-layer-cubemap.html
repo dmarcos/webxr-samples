@@ -294,7 +294,15 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
         let errorCode = 0;
         cubefaceTextures.forEach((canvas, i) => {
-          gl.texImage2D(
+          gl.texSubImage2D(
+            gl.TEXTURE_CUBE_MAP_POSITIVE_X + i,
+            0,
+            0, 0,
+            gl.RGBA,
+            gl.UNSIGNED_BYTE,
+            canvas,
+          );
+/*          gl.texImage2D(
             gl.TEXTURE_CUBE_MAP_POSITIVE_X + i,
             0,
             gl.RGBA,
@@ -302,7 +310,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             gl.UNSIGNED_BYTE,
             canvas,
           );
-
+ */
           errorCode = gl.getError();
         });
 
@@ -489,9 +497,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             glayer = xrGLFactory.getSubImage(cyl_layer, frame);
             gl.bindTexture(gl.TEXTURE_2D, glayer.colorTexture);
             gl.texSubImage2D(gl.TEXTURE_2D, 0, 
-                          0, 0, 
-                          //cyl_texture_width, cyl_texture_height, 
-                          gl.RGBA, gl.UNSIGNED_BYTE, img_tag);
+                             0, 0, 
+                             gl.RGBA, gl.UNSIGNED_BYTE, img_tag);
             gl.bindTexture(gl.TEXTURE_2D, null);
           }
         }
