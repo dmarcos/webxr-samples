@@ -290,14 +290,14 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
         let errorCode = 0;
         cubefaceTextures.forEach((canvas, i) => {
-          /*gl.texImage2D(
+          gl.texImage2D(
             gl.TEXTURE_CUBE_MAP_POSITIVE_X + i,
             0,
             gl.RGBA,
             gl.RGBA,
             gl.UNSIGNED_BYTE,
             canvas,
-          );*/
+          );
 
           errorCode = gl.getError();
         });
@@ -505,7 +505,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             glLayer = session.renderState.baseLayer;
             gl.bindFramebuffer(gl.FRAMEBUFFER, glLayer.framebuffer);
           }
-          gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
           // This is a different rendering pattern than the previous samples
           // used, but it should be more efficent. It's very common for apps
@@ -562,6 +561,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
               cube_layer.orientation = new DOMPointReadOnly(orient[0], orient[1], orient[2], orient[3]);
             }
           }
+          gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
           let views = [];
           for (let view of pose.views) {
             let viewport = null;
