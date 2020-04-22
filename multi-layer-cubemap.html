@@ -45,6 +45,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         <input type="checkbox" id="stereo_layer" value="Bike">stereo equirect layer</input>
         <input type="checkbox" id="change_order">change order</input>
         <input type="checkbox" id="update_pose_every_frame">Update pose every frm</input>
+<!--        <img src="media/textures/milky-way-2k.png" id="img_tag"/> -->
       </details>
     </header>
     <script type="module">
@@ -97,6 +98,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
       let cubeMapTexture = null;
       let cube_face_size = 0;
+
+      let img_tag;
+      let img_tag_ready = false;
       
       function initXR() {
         xrButton = new WebXRButton({
@@ -343,7 +347,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             cube_map_image = img2;
             onImageLoaded(session);
           }
-          //document.body.appendChild(img2);
 
 
           if (stereo_layer.checked) {
@@ -353,11 +356,23 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
               onImageLoaded(session);
             });
           } else {
+            cyl_texture = null;
+            img_tag = document.createElement('img'); // Use DOM HTMLImageElement
+            img_tag.src = 'media/textures/milky-way-2k.png';
+            img_tag_ready = false;
+            img_tag.onload = function() {
+              img_tag_ready = true;
+              cyl_texture_width  = img_tag.width;
+              cyl_texture_height = img_tag.height;
+              onImageLoaded(session);
+            }
+
+            /*
             cyl_texture = loadTexture(gl, 'media/textures/eilenriede-park-2k.png', (w,h) => {
               cyl_texture_width  = w;
               cyl_texture_height = h;
               onImageLoaded(session);
-            });
+            });*/
           }
           texture_copied = false;
         } else {
@@ -401,9 +416,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         cyl_layer = xrGLFactory.createCylinderLayer("texture", {
           pixelWidth: cyl_texture_width, 
           pixelHeight: cyl_texture_height, // / (stereo_layer.checked ? 2 : 1), 
-          centralAngle: 120,
-          aspectRatio: 2,
-          radius: 10,
           layout: ((stereo_layer.checked) ? "stereo-top-bottom" : "mono")
         });
         if (change_order.checked) {
@@ -456,40 +468,30 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           glayer = xrGLFactory.getSubImage(cube_layer, frame);
           copyCubestripToGLBuffer(glayer.colorTexture, cube_map_image);
           
-          
-          /*
-          //if (stereo_layer.checked) {
-            //TODO!
-            //glayer = xrGLFactory.getViewSubImage(session.renderState.layers[0], view);
-          //} else {
-            glayer = xrGLFactory.getSubImage(eqr_layer, frame);
-          //}
-          
-          gl.viewport(0, 0, eqr_texture_width, eqr_texture_height);
-          gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
-          gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, glayer.colorTexture, 0);
+          if (cyl_texture) {
+            glayer = xrGLFactory.getSubImage(cyl_layer, frame);
+            gl.viewport(0, 0, cyl_texture_width, cyl_texture_height);
+            gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
+            gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, glayer.colorTexture, 0);
 
-          gl.disable(gl.SCISSOR_TEST);
-          gl.clearColor(1, 0, 0, 1);
-          gl.clear(gl.COLOR_BUFFER_BIT);
-          stereoUtil.blit(false, eqr_texture, 0, 0, 1, 1, eqr_texture_width, eqr_texture_height);
-                            */
-          glayer = xrGLFactory.getSubImage(cyl_layer, frame);
-          gl.viewport(0, 0, cyl_texture_width, cyl_texture_height);
-          gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
-          gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, glayer.colorTexture, 0);
+            gl.disable(gl.SCISSOR_TEST);
+            gl.clearColor(0, 1, 0, 1);
+            gl.clear(gl.COLOR_BUFFER_BIT);
+            stereoUtil.blit(false, cyl_texture, 0, 0, 1, 1, cyl_texture_width, cyl_texture_height);
+            
+            gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+            gl.deleteFramebuffer(fb);
 
-          gl.disable(gl.SCISSOR_TEST);
-          gl.clearColor(0, 1, 0, 1);
-          gl.clear(gl.COLOR_BUFFER_BIT);
-          stereoUtil.blit(false, cyl_texture, 0, 0, 1, 1, cyl_texture_width, cyl_texture_height);
-          
-          gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-          gl.deleteFramebuffer(fb);
-
-          //gl.deleteTexture(eqr_texture);
-          gl.deleteTexture(cyl_texture);
-          cyl_texture = null;
+            //gl.deleteTexture(eqr_texture);
+            gl.deleteTexture(cyl_texture);
+            cyl_texture = null;
+          } else {
+            glayer = xrGLFactory.getSubImage(cyl_layer, frame);
+            gl.bindTexture(gl.TEXTURE_2D, glayer.colorTexture);
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
+                          gl.RGBA, gl.UNSIGNED_BYTE, img_tag);
+            gl.bindTexture(gl.TEXTURE_2D, 0);
+          }
         }
         if (!session.isImmersive) {
           gl.clearColor(0.1, 0.2, 0.3, 1.0);
