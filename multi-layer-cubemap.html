@@ -582,7 +582,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
               viewport = glLayer.getViewport(view);
             }
             gl.enable(gl.SCISSOR_TEST);
-            gl.scissor(viewport.x, viewport.x, viewport.width, viewport.height); 
+            gl.scissor(viewport.x, viewport.y, viewport.width, viewport.height); 
             gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
             gl.disable(gl.SCISSOR_TEST);
             // Gather all the values needed for one view and push it into the
