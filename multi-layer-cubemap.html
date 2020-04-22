@@ -488,8 +488,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           } else {
             glayer = xrGLFactory.getSubImage(cyl_layer, frame);
             gl.bindTexture(gl.TEXTURE_2D, glayer.colorTexture);
-            gl.texSubImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
-                          0, 0, cyl_texture_width, cyl_texture_height, 
+            gl.texSubImage2D(gl.TEXTURE_2D, 0, 
+                          0, 0, 
+                          //cyl_texture_width, cyl_texture_height, 
                           gl.RGBA, gl.UNSIGNED_BYTE, img_tag);
             gl.bindTexture(gl.TEXTURE_2D, null);
           }
