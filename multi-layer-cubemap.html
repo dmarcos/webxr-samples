@@ -302,15 +302,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             gl.UNSIGNED_BYTE,
             canvas,
           );
-/*          gl.texImage2D(
-            gl.TEXTURE_CUBE_MAP_POSITIVE_X + i,
-            0,
-            gl.RGBA,
-            gl.RGBA,
-            gl.UNSIGNED_BYTE,
-            canvas,
-          );
- */
           errorCode = gl.getError();
         });
 
@@ -415,27 +406,31 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           return;
         xrFramebuffer = gl.createFramebuffer();
         xrGLFactory = new XRWebGLBinding(session, gl);
-        proj_layer = xrGLFactory.createProjectionLayer("texture", {stencil: do_stencil_buffer.checked});
-        cube_layer = xrGLFactory.createCubeLayer({
-          pixelWidth: cube_face_size, 
-          pixelHeight: cube_face_size, // / (stereo_layer.checked ? 2 : 1), 
-          layout: ((stereo_layer.checked) ? "stereo" : "mono")
+        session.requestReferenceSpace('local').then((refSpace) => {
+          proj_layer = xrGLFactory.createProjectionLayer("texture", {space: refSpace, stencil: do_stencil_buffer.checked});
+          cube_layer = xrGLFactory.createCubeLayer({
+            space: refSpace, 
+            pixelWidth: cube_face_size, 
+            pixelHeight: cube_face_size, // / (stereo_layer.checked ? 2 : 1), 
+            layout: ((stereo_layer.checked) ? "stereo" : "mono")
+          });
+          cyl_layer = xrGLFactory.createCylinderLayer("texture", {
+            space: refSpace, 
+            pixelWidth: cyl_texture_width, 
+            pixelHeight: cyl_texture_height, // / (stereo_layer.checked ? 2 : 1), 
+            layout: ((stereo_layer.checked) ? "stereo-top-bottom" : "mono")
+          });
+          if (change_order.checked) {
+            session.updateRenderState({ layers: [ cube_layer, cyl_layer, proj_layer ] });
+            cyl_layer_idx = 1;
+            proj_layer_idx = 2;
+          } else {
+            session.updateRenderState({ layers: [ cube_layer, proj_layer, cyl_layer ] });
+            proj_layer_idx = 1;
+            cyl_layer_idx = 2;
+          }
+          finalizeSessionStart(session);
         });
-        cyl_layer = xrGLFactory.createCylinderLayer("texture", {
-          pixelWidth: cyl_texture_width, 
-          pixelHeight: cyl_texture_height, // / (stereo_layer.checked ? 2 : 1), 
-          layout: ((stereo_layer.checked) ? "stereo-top-bottom" : "mono")
-        });
-        if (change_order.checked) {
-          session.updateRenderState({ layers: [ cube_layer, cyl_layer, proj_layer ] });
-          cyl_layer_idx = 1;
-          proj_layer_idx = 2;
-        } else {
-          session.updateRenderState({ layers: [ cube_layer, proj_layer, cyl_layer ] });
-          proj_layer_idx = 1;
-          cyl_layer_idx = 2;
-        }
-        finalizeSessionStart(session);
       }
 
       function onEndSession(session) {
@@ -564,7 +559,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
           // Updating cylinder layer every frame
           if (session.isImmersive) {
-            cube_layer.space = refSpace;
+            //cube_layer.space = refSpace;
 
             if (update_pose_every_frame.checked) {
               let orient = quat.create();//{x:0,y:0,z:0,w:1};
