@@ -459,6 +459,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
         session.requestAnimationFrame(onXRFrame);
 
+        if (!cyl_layer.hasValidContent || !cube_layer.hasValidContent) {
+          texture_copied = false;
+        }
+
         if (session.isImmersive && !texture_copied) {
           //eqr_layer = session.renderState.layers[eqr_layer_idx];
           //proj_layer = session.renderState.layers[proj_layer_idx];
