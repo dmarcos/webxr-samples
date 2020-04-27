@@ -466,10 +466,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           let fb = gl.createFramebuffer();
           let glayer;
                                                        
-          if (cube_layer.layout() == "mono") {
+          if (cube_layer.layout == "mono") {
             glayer = xrGLFactory.getSubImage(cube_layer, frame);
             copyCubestripToGLBuffer(glayer.colorTexture, cube_map_image, 0);
-          } else if (cube_layer.layout() == "stereo") {
+          } else if (cube_layer.layout == "stereo") {
             let offset = 0;
             for (let view of pose.views) {
               glayer = xrGLFactory.getViewSubImage(cube_layer, view);
