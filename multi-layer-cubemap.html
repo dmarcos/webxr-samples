@@ -458,7 +458,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         session.requestAnimationFrame(onXRFrame);
 
         if (session.isImmersive &&
-            (!cyl_layer.hasValidContent || !cube_layer.hasValidContent)) {
+            (cyl_layer.needsRedraw || cube_layer.needsRedraw)) {
           texture_copied = false;
         }
 
