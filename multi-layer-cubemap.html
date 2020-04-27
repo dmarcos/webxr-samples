@@ -477,7 +477,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
               ++offset;
             }     
             let orient = quat.create();
-            quat.fromEuler(orient, 0, Math.PI / 2, 0);
+            quat.fromEuler(orient, 0, -60, 0);
             cube_layer.orientation = new DOMPointReadOnly(orient[0], orient[1], orient[2], orient[3]);
           } else {
             console.log("Invalid layout for cube");
