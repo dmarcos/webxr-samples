@@ -437,15 +437,16 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       function onSessionEnded(event) {
         if (event.session.isImmersive) {
           xrButton.setSession(null);
+
+          if (cyl_texture != null) {
+            gl.deleteTexture(cyl_texture);
+            cyl_texture = null;
+          }
         }
       }
 
       function onXRFrame(t, frame) {
         ++frame_id; 
-//        if (cubeMapImgReady) {
-  //        cubeMapTexture = copyCubestripToGLBuffer(img2);
-    //    }
-
         let session = frame.session;
         let refSpace = session.isImmersive ?
                          xrImmersiveRefSpace :
@@ -496,10 +497,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             
             gl.bindFramebuffer(gl.FRAMEBUFFER, null);
             gl.deleteFramebuffer(fb);
-
-            //gl.deleteTexture(eqr_texture);
-            gl.deleteTexture(cyl_texture);
-            cyl_texture = null;
           } else {
             glayer = xrGLFactory.getSubImage(cyl_layer, frame);
             gl.bindTexture(gl.TEXTURE_2D, glayer.colorTexture);
