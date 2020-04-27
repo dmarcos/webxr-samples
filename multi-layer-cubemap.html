@@ -42,8 +42,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           <a class="back" href="./">Back</a>
         </p>
         <input type="checkbox" id="do_stencil_buffer">stencil buffer</input>
-        <input type="checkbox" id="stereo_layer" value="Bike">stereo equirect layer</input>
-        <input type="checkbox" id="change_order">change order</input>
+        <input type="checkbox" id="stereo_layer">stereo cube map</input>
         <input type="checkbox" id="update_pose_every_frame">Update pose every frm</input>
 <!--        <img src="media/textures/milky-way-2k.png" id="img_tag"/> -->
       </details>
@@ -93,8 +92,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       let cyl_texture_width;
       let cyl_texture_height;
       let cyl_layer = null;
-      let proj_layer_idx = 1;
-      let cyl_layer_idx = 2;
 
       let cubeMapTexture = null;
       let cube_face_size = 0;
@@ -251,7 +248,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       // This is a fairly expensive operation, since it involves slicing out
       // pieces of the texure jpeg and potentially resizing them, but it only
       // happens once on the initial render for a photo.
-      function copyCubestripToGLBuffer(tex, sourceImageElement) {
+      function copyCubestripToGLBuffer(tex, sourceImageElement, offset_in_faces) {
         //const tex = __getNewGLTexObj(gl.TEXTURE_CUBE_MAP);
 
         // our target cube face size.
@@ -280,7 +277,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           // smaller than the source image due to GL max texture size.
           tempCanvasContext.drawImage(
             sourceImageElement,
-            i * textureSourceCubeFaceSize, // top left x coord in source
+            (i + offset_in_faces) * textureSourceCubeFaceSize, // top left x coord in source
             0, // top left y coord in source
             textureSourceCubeFaceSize, // x pixel count from source
             textureSourceCubeFaceSize, // y pixel count from source
@@ -338,23 +335,30 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
         if (session.isImmersive) {
           cube_map_image = null;
-          let img2 = document.createElement('img'); // Use DOM HTMLImageElement
-          img2.src = 'media/textures/mono_cube_map.png';
-          img2.alt = 'alt text';
-          img2.onload = function() {
-            cube_face_size = _getCubeTextureSize(img2);
-            cube_map_image = img2;
-            onImageLoaded(session);
-          }
-
 
           if (stereo_layer.checked) {
+            let img2 = document.createElement('img'); // Use DOM HTMLImageElement
+            img2.src = 'media/textures/stereo_cube_map.png';
+            img2.onload = function() {
+              cube_face_size = _getCubeTextureSize(img2);
+              cube_map_image = img2;
+              onImageLoaded(session);
+            }
+
             cyl_texture = loadTexture(gl, 'media/textures/stereo-top-bottom-image.png', (w,h) => {
               cyl_texture_width  = w;
               cyl_texture_height = h;
               onImageLoaded(session);
             });
           } else {
+            let img2 = document.createElement('img'); // Use DOM HTMLImageElement
+            img2.src = 'media/textures/mono_cube_map.png';
+            img2.onload = function() {
+              cube_face_size = _getCubeTextureSize(img2);
+              cube_map_image = img2;
+              onImageLoaded(session);
+            }
+
             cyl_texture = null;
             img_tag = document.createElement('img'); // Use DOM HTMLImageElement
             img_tag.src = 'media/textures/milky-way-2k.png';
@@ -420,15 +424,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             viewPixelHeight: cyl_texture_height, // / (stereo_layer.checked ? 2 : 1), 
             layout: ((stereo_layer.checked) ? "stereo-top-bottom" : "mono")
           });
-          if (change_order.checked) {
-            session.updateRenderState({ layers: [ cube_layer, cyl_layer, proj_layer ] });
-            cyl_layer_idx = 1;
-            proj_layer_idx = 2;
-          } else {
-            session.updateRenderState({ layers: [ cube_layer, proj_layer, cyl_layer ] });
-            proj_layer_idx = 1;
-            cyl_layer_idx = 2;
-          }
+          session.updateRenderState({ layers: [ cube_layer, proj_layer, cyl_layer ] });
+
           finalizeSessionStart(session);
         });
       }
@@ -465,17 +462,24 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         }
 
         if (session.isImmersive && !texture_copied) {
-          //eqr_layer = session.renderState.layers[eqr_layer_idx];
-          //proj_layer = session.renderState.layers[proj_layer_idx];
-          //cyl_layer = session.renderState.layers[cyl_layer_idx];
-
           texture_copied = true;
           let fb = gl.createFramebuffer();
           let glayer;
+                                                       
+          if (cube_layer.layout() == "mono") {
+            glayer = xrGLFactory.getSubImage(cube_layer, frame);
+            copyCubestripToGLBuffer(glayer.colorTexture, cube_map_image, 0);
+          } else if (cube_layer.layout() == "stereo") {
+            let offset = 0;
+            for (let view of pose.views) {
+              glayer = xrGLFactory.getViewSubImage(cube_layer, view);
+              copyCubestripToGLBuffer(glayer.colorTexture, cube_map_image, offset*6);
+              ++offset;
+            }     
+          } else {
+            console.log("Invalid layout for cube");
+          }
 
-          glayer = xrGLFactory.getSubImage(cube_layer, frame);
-          copyCubestripToGLBuffer(glayer.colorTexture, cube_map_image);
-          
           if (cyl_texture) {
             glayer = xrGLFactory.getSubImage(cyl_layer, frame);
             gl.viewport(0, 0, cyl_texture_width, cyl_texture_height);
