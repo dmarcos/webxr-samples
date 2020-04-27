@@ -415,13 +415,13 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           cube_layer = xrGLFactory.createCubeLayer({
             space: refSpace, 
             viewPixelWidth: cube_face_size, 
-            viewPixelHeight: cube_face_size, // / (stereo_layer.checked ? 2 : 1), 
+            viewPixelHeight: cube_face_size,
             layout: ((stereo_layer.checked) ? "stereo" : "mono")
           });
           cyl_layer = xrGLFactory.createCylinderLayer("texture", {
             space: refSpace, 
             viewPixelWidth: cyl_texture_width, 
-            viewPixelHeight: cyl_texture_height, // / (stereo_layer.checked ? 2 : 1), 
+            viewPixelHeight: cyl_texture_height / (stereo_layer.checked ? 2 : 1), 
             layout: ((stereo_layer.checked) ? "stereo-top-bottom" : "mono")
           });
           session.updateRenderState({ layers: [ cube_layer, proj_layer, cyl_layer ] });
