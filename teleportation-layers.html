@@ -506,17 +506,17 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             if (cyl_texture_width != 0 && cyl_texture_height != 0) {
               cyl_layer = xrGLFactory.createCylinderLayer("texture", {
                 space: refSpace,
-                pixelWidth: cyl_texture_width,
-                pixelHeight: cyl_texture_height, // / ((stereo_layer.checked)?2:1), 
+                viewPixelWidth: cyl_texture_width,
+                viewPixelHeight: cyl_texture_height / ((stereo_layer.checked)?2:1), 
                 layout: ((stereo_layer.checked)?"stereo-top-bottom":"mono")
               });
               cyl_layer.centralAngle = 60 * Math.PI / 180;
-              cyl_layer.aspectRatio = cyl_layer.pixelWidth/(cyl_layer.pixelHeight / ((stereo_layer.checked) ? 2 : 1));
+              cyl_layer.aspectRatio = cyl_layer.viewPixelWidth/cyl_layer.viewPixelHeight;
               cyl_layer.radius = 2;
               quad_layer = xrGLFactory.createQuadLayer("texture", {
                 space: refSpace,
-                pixelWidth: cyl_texture_width,
-                pixelHeight: cyl_texture_height, // / ((stereo_layer.checked)?2:1), 
+                viewPixelWidth: cyl_texture_width,
+                viewPixelHeight: cyl_texture_height / ((stereo_layer.checked)?2:1), 
                 layout: ((stereo_layer.checked)?"stereo-top-bottom":"mono")
               });
               quad_layer.width = 4;

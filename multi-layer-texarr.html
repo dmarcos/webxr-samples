@@ -182,7 +182,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             });
           }
         } else {
-          let layer = xrGLFactory.createCylinderLayer(texture_array.checked?"texture-array":"texture", {pixelWidth: 200, pixelHeight: 100, stereo: (stereo_layer.checked ? "stereo" : "mono")});
+          let layer = xrGLFactory.createCylinderLayer(texture_array.checked?"texture-array":"texture", {viewPixelWidth: 200, viewPixelHeight: 100, stereo: (stereo_layer.checked ? "stereo" : "mono")});
           if (single_layer) { 
             session.updateRenderState({ layers: [ layer ] });
 
@@ -193,7 +193,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
               session.requestAnimationFrame(onXRFrame);
             });
           } else {
-            let layer2 = xrGLFactory.createCylinderLayer(texture_array.checked?"texture-array":"texture", {pixelWidth: 200, pixelHeight: 100, stereo: (stereo_layer.checked ? "stereo" : "mono")});
+            let layer2 = xrGLFactory.createCylinderLayer(texture_array.checked?"texture-array":"texture", {viewPixelWidth: 200, viewPixelHeight: 100, stereo: (stereo_layer.checked ? "stereo" : "mono")});
             layer2.radius = 2;
             layer2.centralAngle = 180 * Math.PI / 180;
             session.updateRenderState({ layers: [ layer, layer2 ] });
@@ -242,8 +242,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           let numlayers = session.renderState.layers.length;
           let arraylength = session.renderState.layers.length;
           session.renderState.layers.forEach(function(glLayer) {   
-            const width = glLayer.pixelWidth;
-            const height = glLayer.pixelHeight;
+            const width = glLayer.viewPixelWidth;
+            const height = glLayer.viewPixelHeight;
             let offset = 0;
             pose.views.forEach(view => {
               let subimage = null;

@@ -122,7 +122,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         videoTexture= gl.createTexture();
         xrGLFactory = new XRWebGLBinding(session, gl);
 
-        let layer = xrGLFactory.createCylinderLayer("texture", {pixelWidth: 480, pixelHeight: 270, stereo: (stereo_layer.checked ? "stereo" : "mono")});
+        let layer = xrGLFactory.createCylinderLayer("texture", {viewPixelWidth: 480, viewPixelHeight: 270, stereo: (stereo_layer.checked ? "stereo" : "mono")});
         session.updateRenderState({ layers: [ layer ] });
 
         session.requestReferenceSpace('local').then((refSpace) => {
