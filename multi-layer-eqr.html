@@ -333,6 +333,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
         session.requestAnimationFrame(onXRFrame);
 
+        if (session.isImmersive &&
+            (cyl_layer.needsRedraw || eqr_layer.needsRedraw)) {
+          texture_copied = false;
+        }
         if (session.isImmersive && !texture_copied) {
           eqr_layer = session.renderState.layers[eqr_layer_idx];
           proj_layer = session.renderState.layers[proj_layer_idx];
@@ -340,13 +344,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
           texture_copied = true;
           let fb = gl.createFramebuffer();
-          let glayer;
-          //if (stereo_layer.checked) {
-            //TODO!
-            //glayer = xrGLFactory.getViewSubImage(session.renderState.layers[0], view);
-          //} else {
-            glayer = xrGLFactory.getSubImage(eqr_layer, frame);
-          //}
+          let glayer = xrGLFactory.getSubImage(eqr_layer, frame);
           
           gl.viewport(0, 0, eqr_texture_width, eqr_texture_height);
           gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
