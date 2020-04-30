@@ -371,10 +371,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           
           gl.bindFramebuffer(gl.FRAMEBUFFER, null);
           gl.deleteFramebuffer(fb);
-
-          gl.deleteTexture(eqr_texture);
-          gl.deleteTexture(cyl_texture);
-          eqr_texture = cyl_texture = null;
         }
         if (!session.isImmersive) {
           gl.clearColor(0.1, 0.2, 0.3, 1.0);
