@@ -344,7 +344,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       }
 
       function onVisibilityChange(event) {
-        if (session.isImmersive) {
+        if (session != null && session.isImmersive) {
           console.log("Visibility change: " + event.session.visibilityState);
           if (event.session.visibilityState == "visible") {
             paused = false;

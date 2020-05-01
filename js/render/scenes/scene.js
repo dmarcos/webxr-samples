@@ -239,14 +239,16 @@ export class Scene extends Node {
     let layer = session.renderState.baseLayer;
     if (!layer)
       layer = session.renderState.layers[0];
+    else {
+      // only baseLayer has framebuffer and we need to bind it
+      // even if it is null (for inline sessions)
+      gl.bindFramebuffer(gl.FRAMEBUFFER, layer.framebuffer);
+    }
 
     if (!gl) {
       return;
     }
 
-    if (layer.framebuffer) {
-      gl.bindFramebuffer(gl.FRAMEBUFFER, layer.framebuffer);
-    }
     if (layer.colorTexture) {
       gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, layer.colorTexture, 0);
     }
