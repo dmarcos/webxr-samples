@@ -45,6 +45,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         <input type="checkbox" id="stereo_layer" value="Bike">stereo equirect layer</input>
         <input type="checkbox" id="change_order">change order</input>
         <input type="checkbox" id="update_cylinder_every_frame">Update cyl every frm</input>
+        <input type="number" id="radius_txt">Radius</input>
       </details>
     </header>
     <script type="module">
@@ -488,7 +489,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           eqrlayer.scaleX = 2;
           eqrlayer.scaleY = 1;
           eqrlayer.biasX = -0.5;
-          eqrlayer.radius = 3;
+          eqrlayer.radius = document.getElementById("radius_txt").value;
 
           cyl_layer = xrGLFactory.createCylinderLayer("texture", {
             space: refSpace, 
