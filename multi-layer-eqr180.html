@@ -68,6 +68,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       }
 
       let boxTable = {};
+      let eqr_pos = { x: 0.0, y: 0.0, z: 0.0 };
+      let eqr_orient = { yaw: 0.0, pitch: 0.0, roll: 0.0 };
 
       // XR globals.
       let do_stencil_buffer = document.getElementById('do_stencil_buffer');
@@ -344,6 +346,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         }
       }
 
+      function updateEqrTransform() {
+        const orient = quat.create();
+        quat.fromEuler(orient, eqr_orient.pitch, eqr_orient.yaw, eqr_orient.roll);
+        eqr_layer.transform = new XRRigidTransform(pos, {x: orient[0], y: orient[1], z: orient[2], w: orient[3]});
+      }
       function ProcessGamepad(gamepad, hand, pose) {
         if (!(hand in boxTable)) {
           boxTable[hand] = new GamepadBoxSet(gamepad.buttons.length, gamepad.axes.length);
@@ -355,13 +362,20 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         if (eqr_layer != null) {
           if (hand == "right") {
             const tilt = gamepad.axes[3];
+            const rot = gamepad.axes[2];
+
+            // tilt
+            eqr_orient.pitch = tilt * 90;
+            eqr_orient.yaw = rot * 90;
+            updateEqrTransform();
+          } else if (hand == "left") {
+            const zoom = gamepad.axes[3];
             const horizontal_shift = gamepad.axes[2];
 
             // tilt
-            const pos = {x: horizontal_shift * 5, y: 0.0, z: 0.0};
-            const orient = quat.create();
-            quat.fromEuler(orient, tilt * 90, 0, 0);
-            eqr_layer.transform = new XRRigidTransform(pos, {x: orient[0], y: orient[1], z: orient[2], w: orient[3]});
+            eqr_pos.x = horizontal_shift * 4;
+            eqr_pos.z = zoom * 3;
+            updateEqrTransform();
           }
         }
 
