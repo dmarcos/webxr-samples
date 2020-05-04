@@ -204,6 +204,101 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
       }
 
+
+      const BOX_SIZE = 0.03;
+      const BOX_MOTION_RANGE = 0.010;
+      const BOX_SEPARATION = 0.04;
+      const BOX_SET_HEIGHT = 0.03;
+      const BOX_SET_DEPTH = -0.06;
+
+      class GamepadBox extends Node {
+        constructor(position) {
+          super();
+
+          this.position = position;
+          let boxBuilder = new BoxBuilder();
+          boxBuilder.pushCube([0, 0, 0], BOX_SIZE);
+          let boxPrimitive = boxBuilder.finishPrimitive(renderer);
+          let boxMaterial = new PbrMaterial();
+          boxMaterial.baseColorFactor.value = [0.1, 0.1, 0.1, 1]; // grey
+          this.renderPrimitive = renderer.createRenderPrimitive(boxPrimitive, boxMaterial);
+
+          this.addRenderPrimitive(this.renderPrimitive);
+
+          mat4.identity(this.matrix);
+          mat4.translate(this.matrix, this.matrix, this.position);
+
+          this._value = 0.0;
+          this._pressed = false;
+          this._touched = false;
+          this._dx = 0.0;
+          this._dy = 0.0;
+        }
+
+        _updateTransform() {
+          mat4.identity(this.matrix);
+          mat4.translate(this.matrix, this.matrix, this.position);
+          mat4.translate(this.matrix, this.matrix, [
+            this._dx * BOX_MOTION_RANGE,
+            -this._value * BOX_SIZE * 0.5,
+            this._dy * BOX_MOTION_RANGE
+          ]);
+          mat4.scale(this.matrix, this.matrix, [1.0, 1.05 - this._value, 1.0]);
+        }
+
+        _updateColor() {
+          let color = null;
+          if (this._pressed) {
+            color = [1, 0, 0, 1]; // Red
+          } else if (this._touched) {
+            color = [0.1, 0.5, 0.1, 1]; // Dark Green
+          } else {
+            color = [0.1, 0.1, 0.1, 1];  // Grey
+          }
+
+          this.renderPrimitive.uniforms.baseColorFactor.value = color;
+        }
+
+        set value(value) {
+          if (value != this._value) {
+            this._value = value;
+            this._updateTransform();
+          }
+        }
+
+        get value() {
+          return this._value;
+        }
+
+        set pressed(value) {
+          if (value != this._pressed) {
+            this._pressed = value;
+            this._updateColor();
+          }
+        }
+
+        get pressed() {
+          return this._pressed;
+        }
+
+        set touched(value) {
+          if (value != this._touched) {
+            this._touched = value;
+            this._updateColor();
+          }
+        }
+
+        get touched() {
+          return this._touched;
+        }
+
+        move(dx, dy) {
+          this._dx = dx;
+          this._dy = dy;
+          this._updateTransform();
+        }
+      }
+
       class GamepadBoxSet extends Node {
         constructor(buttonCount, axesCount) {
           super();
