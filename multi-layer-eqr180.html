@@ -352,6 +352,18 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
         boxTable[hand].update_state(gamepad);
 
+        if (eqr_layer != null) {
+          if (hand == "right") {
+            const v = gamepad.axes[3];
+
+            // tilt
+            const pos = {x: 0.0, y: 0.0, z: 0.0};
+            const orient = quat.create();
+            quat.fromEuler(orient, v * 90, 0, 0);
+            eqr_layer.transform = new XRRigidTransform(pos, {x: orient[0], y: orient[1], z: orient[2], w: orient[3]});
+          }
+        }
+
         // Update the pose of the boxes to sync with the controller.
         if (pose) {
           boxTable[hand].matrix = pose.transform.matrix;
