@@ -354,12 +354,13 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
         if (eqr_layer != null) {
           if (hand == "right") {
-            const v = gamepad.axes[3];
+            const tilt = gamepad.axes[3];
+            const horizontal_shift = gamepad.axes[2];
 
             // tilt
-            const pos = {x: 0.0, y: 0.0, z: 0.0};
+            const pos = {x: horizontal_shift * 5, y: 0.0, z: 0.0};
             const orient = quat.create();
-            quat.fromEuler(orient, v * 90, 0, 0);
+            quat.fromEuler(orient, tilt * 90, 0, 0);
             eqr_layer.transform = new XRRigidTransform(pos, {x: orient[0], y: orient[1], z: orient[2], w: orient[3]});
           }
         }
@@ -473,6 +474,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           eqrlayer.scaleX = 2;
           eqrlayer.scaleY = 1;
           eqrlayer.biasX = -0.5;
+          eqrlayer.radius = 3;
 
           cyl_layer = xrGLFactory.createCylinderLayer("texture", {
             space: refSpace, 
