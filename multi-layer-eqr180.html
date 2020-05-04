@@ -62,6 +62,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         let polyfill = new WebXRPolyfill();
       }
 
+      let boxTable = {};
 
       // XR globals.
       let do_stencil_buffer = document.getElementById('do_stencil_buffer');
@@ -199,6 +200,72 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
         stereoUtil = new VRStereoUtil(gl);
 
+      }
+
+      class GamepadBoxSet extends Node {
+        constructor(buttonCount, axesCount) {
+          super();
+
+          let axesBoxCount = Math.ceil(axesCount / 2);
+          let rowLength = Math.max(buttonCount, axesBoxCount);
+
+          // Place the boxes in a horizontal line
+          this.buttonBoxes = [];
+          let hl = (rowLength - 1) * BOX_SEPARATION * 0.5;
+          for (let x = 0; x < buttonCount; ++x) {
+            let box = new GamepadBox([(x * BOX_SEPARATION) - hl, BOX_SET_HEIGHT, BOX_SET_DEPTH]);
+            this.buttonBoxes.push(box);
+            this.addNode(box);
+          }
+
+          this.axesBoxes = [];
+          for (let x = 0; x < axesBoxCount; ++x) {
+            let box = new GamepadBox([(x * BOX_SEPARATION) - hl, BOX_SET_HEIGHT, BOX_SET_DEPTH * 2]);
+            this.axesBoxes.push(box);
+            this.addNode(box);
+          }
+        }
+
+        update_state(gamepad) {
+          // The boxes associated with any given button will turn green if
+          // touched and red if pressed. The box height will also scale based
+          // on the button's value to make it appear like a button being pushed.
+          for (let i = 0; i < gamepad.buttons.length; ++i) {
+            this.buttonBoxes[i].pressed = gamepad.buttons[i].pressed;
+            this.buttonBoxes[i].value = gamepad.buttons[i].value;
+            this.buttonBoxes[i].touched = gamepad.buttons[i].touched;
+          }
+
+          // Axes are assumed to come in X/Y pairs and will wiggle the
+          // associated boxes around when moved.
+          for (let i = 0, j = 0; i < gamepad.axes.length; i+=2, ++j) {
+            this.axesBoxes[j].move(gamepad.axes[i], i + 1 < gamepad.axes.length ? gamepad.axes[i + 1] : 0);
+          }
+        }
+      }
+
+      function ProcessGamepad(gamepad, hand, pose) {
+        if (!(hand in boxTable)) {
+          boxTable[hand] = new GamepadBoxSet(gamepad.buttons.length, gamepad.axes.length);
+          scene.addNode(boxTable[hand]);
+        }
+
+        boxTable[hand].update_state(gamepad);
+
+        // Update the pose of the boxes to sync with the controller.
+        if (pose) {
+          boxTable[hand].matrix = pose.transform.matrix;
+        }
+        if ("hapticActuators" in gamepad && gamepad.hapticActuators.length > 0) {
+          for (let j = 0; j < gamepad.buttons.length; ++j) {
+            if (gamepad.buttons[j].pressed) {
+              // Vibrate the gamepad using to the value of the button as
+              // the vibration intensity, normalized to 0.0..1.0 range.
+              gamepad.hapticActuators[0].pulse((j + 1.0) / (gamepad.buttons.length + 1), 1000);
+              break;
+            }
+          }
+        }
       }
 
       function onRequestSession() {
@@ -479,6 +546,14 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             views.push(new WebXRView(view, glLayer, viewport));
           }
 
+          // Check for and respond to any gamepad state changes.
+          for (let source of session.inputSources) {
+            if (source.gamepad) {
+              let pose = frame.getPose(source.gripSpace, refSpace);
+              ProcessGamepad(source.gamepad, source.handedness, pose);
+            }
+          }
+          scene.updateInputSources(frame, refSpace);
           scene.drawViewArray(views);
         }
         
