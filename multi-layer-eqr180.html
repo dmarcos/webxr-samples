@@ -31,6 +31,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
     <title>Multilayer Equirect 180</title>
     <script src="js/wglu/wglu-program.js"></script>
+    <script src="js/wglu/wglu-url.js"></script>
     <script src="js/stereo-util.js"></script>
   </head>
   <body>
@@ -68,6 +69,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         let polyfill = new WebXRPolyfill();
       }
 
+      let noAlpha = WGLUUrl.getBool('noAlpha', false);
       let boxTable = {};
       let eqr_pos = { x: 0.0, y: 0.0, z: 0.0 };
       let eqr_orient = { yaw: 0.0, pitch: 0.0, roll: 0.0 };
@@ -187,7 +189,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
         gl = createWebGLContext({
           xrCompatible: true,
-          webgl2: true
+          webgl2: true,
+          alpha: !noAlpha
         });
         document.body.appendChild(gl.canvas);
         gl_ext = gl.getExtension('WEBGL_depth_texture');
