@@ -478,7 +478,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       }
 
       function eqr_angles_to_bias_scale(eqrlayer, central_angle, upper_vert_angle, lower_vert_angle) {
-        const hemifrac = central_angle / Math.PI;
+        const hemifrac = central_angle / (2.0 * Math.PI);
         const vertscale = 1.0;
 //        const float aspectScale = 2.0 * central_angle_ / aspect_ratio_;
         let trans1 = mat4.create();
