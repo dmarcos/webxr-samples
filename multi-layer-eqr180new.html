@@ -479,14 +479,19 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
       function eqr_angles_to_bias_scale(eqrlayer, central_angle, upper_vert_angle, lower_vert_angle) {
         const hemifrac = central_angle / (2.0 * Math.PI);
-        const vertscale = 1.0;
-//        const float aspectScale = 2.0 * central_angle_ / aspect_ratio_;
+        upper_vert_angle = (upper_vert_angle + Math.PI / 2.0)
+        lower_vert_angle = (lower_vert_angle + Math.PI / 2.0)
+        const total_vert_angle = upper_vert_angle + lower_vert_angle;
+        const upper_vertscale = (upper_vert_angle + Math.PI / 2.0) / Math.PI;
+        const lower_vertscale = (lower_vert_angle + Math.PI / 2.0) / Math.PI;
+        const vert_scale = total_vert_angle / (2.0 * Math.PI);
+        const vert_offset = upper_vertscale / total_vert_angle;
         let trans1 = mat4.create();
         let trans2 = mat4.create();
         let scale = mat4.create();
-        mat4.fromTranslation(trans1, [ -0.5, -0.5, 0.0 ]);
-        mat4.fromTranslation(trans2, [  0.5,  0.5, 0.0 ]);
-        mat4.fromScaling(scale, [hemifrac, vertscale, 1.0]);
+        mat4.fromTranslation(trans1, [ -0.5, -vert_offset, 0.0 ]);
+        mat4.fromTranslation(trans2, [  0.5,  vert_offset, 0.0 ]);
+        mat4.fromScaling(scale, [hemifrac, vert_scale, 1.0]);
         let inv_tex_mat = mat4.create();
         mat4.multiply(inv_tex_mat, scale, trans1);
         mat4.multiply(inv_tex_mat, trans2, inv_tex_mat);
