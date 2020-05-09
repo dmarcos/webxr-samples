@@ -493,14 +493,14 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         let tex_mat = mat4.create();
         mat4.invert(tex_mat, inv_tex_mat);
 
-        let scale = vec3.create();
-        mat4.getScaling(scale, tex_mat);
+        let scaling = vec3.create();
+        mat4.getScaling(scaling, tex_mat);
 
         let trans = vec3.create();
         mat4.getTranslation(trans, tex_mat);
 
-        eqrlayer.scaleX = scale[0];
-        eqrlayer.scaleY = scale[1];
+        eqrlayer.scaleX = scaling[0];
+        eqrlayer.scaleY = scaling[1];
         eqrlayer.biasX = trans[0];
         eqrlayer.biasY = trans[1];
       }
