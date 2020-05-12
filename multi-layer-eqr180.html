@@ -482,7 +482,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         xrFramebuffer = gl.createFramebuffer();
         xrGLFactory = new XRWebGLBinding(session, gl);
         session.requestReferenceSpace('local').then((refSpace) => {
-          let projlayer = xrGLFactory.createProjectionLayer("texture", {space: refSpace, stencil: do_stencil_buffer.checked});
+          let projlayer = xrGLFactory.createProjectionLayer("texture", {space: refSpace, stencil: do_stencil_buffer.checked, alpha: !noAlpha});
           let eqrlayer = xrGLFactory.createEquirectLayer("texture", {
             space: refSpace, 
             viewPixelWidth: eqr_texture_width, 
