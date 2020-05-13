@@ -489,9 +489,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             viewPixelHeight: eqr_texture_height / (stereo_layer.checked ? 2 : 1), 
             layout: ((stereo_layer.checked) ? "stereo-top-bottom" : "mono")
           });
-          eqrlayer.centralHorizontalAngle = Math,PI;
-          eqrlayer.upperVerticalAngle = Math,PI / 2.0;
-          eqrlayer.lowerVerticalAngle = -Math,PI / 2.0;
+          eqrlayer.centralHorizontalAngle = Math.PI;
+          eqrlayer.upperVerticalAngle = Math.PI / 2.0;
+          eqrlayer.lowerVerticalAngle = -Math.PI / 2.0;
           eqrlayer.radius = document.getElementById("radius_txt").value;
 
           cyl_layer = xrGLFactory.createCylinderLayer("texture", {
