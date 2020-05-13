@@ -477,7 +477,22 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         });
       }
 
-      function eqr_angles_to_bias_scale(eqrlayer, central_angle, upper_vert_angle, lower_vert_angle) {
+      function eqr_angles_to_bias_scale(eqrlayer, radius, centralHorizontalAngle, upperVerticalAngle, lowerVerticalAngle) {
+  
+            // converting from equirect2 parameters
+            //const centralHorizontalAngle = (2.0 * Math.PI) / 3.0;
+            //const upperVerticalAngle =
+            //    (Math.PI / 2.0) * (2.0 / 3.0); // 60 degrees north latitude
+            // const float lowerVerticalAngle = -(Math.PI / 2.0f) * (2.0f / 3.0f); // 60 degrees
+            // south latitude const float upperVerticalAngle = 0.0f; // equator
+            eqrlayer.scaleX = (2.0 * Math.PI) / centralHorizontalAngle;
+            eqrlayer.scaleY = Math.PI / (upperVerticalAngle - lowerVerticalAngle);
+            eqrlayer.biasX = 0.5 - eqrlayer.scaleX * 0.5;
+            // the image origin is in the upper left
+            const upperFrac = 0.5 - (upperVerticalAngle / Math.PI);
+            eqrlayer.biasY = -eqrlayer.scaleY * upperFrac;
+        
+                                                /*
         const hemifrac = central_angle / (2.0 * Math.PI);
         upper_vert_angle = (upper_vert_angle + Math.PI / 2.0)
         lower_vert_angle = (lower_vert_angle + Math.PI / 2.0)
@@ -507,7 +522,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         eqrlayer.scaleX = scaling[0];
         eqrlayer.scaleY = scaling[1];
         eqrlayer.biasX = trans[0];
-        eqrlayer.biasY = trans[1];
+        eqrlayer.biasY = trans[1]; */
       }
 
       function onImageLoaded(session) {
@@ -524,7 +539,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             layout: ((stereo_layer.checked) ? "stereo-top-bottom" : "mono")
           });
 
-          eqr_angles_to_bias_scale(eqrlayer, 2*Math.PI/3, -Math.PI/4, -Math.PI/4); 
+          //eqr_angles_to_bias_scale(eqrlayer, 0, 2*Math.PI/3, -Math.PI/4, -Math.PI/4); 
+          eqr_angles_to_bias_scale(eqrlayer, 4.0, (2.0 * Math.PI) / 3.0, (Math.PI / 2.0) * (2.0 / 3.0), 0.0); 
           console.log("eqrlayer.scaleX = " + eqrlayer.scaleX);
           console.log("eqrlayer.scaleY = " + eqrlayer.scaleY);
           console.log("eqrlayer.biasX = " + eqrlayer.biasX);
