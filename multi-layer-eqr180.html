@@ -363,7 +363,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
         boxTable[hand].update_state(gamepad);
 
-        if (eqr_layer != null) {
+        if (eqr_layer != null && "axes" in gamepad && gamepad.axes.length >= 4) {
           if (hand == "right") {
             const tilt = gamepad.axes[3];
             const rot = gamepad.axes[2];
