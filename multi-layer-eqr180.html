@@ -551,7 +551,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           let fb = gl.createFramebuffer();
           let glayer = xrGLFactory.getSubImage(eqr_layer, frame);
           
-          console.log("EQR Texture W = "+glayer.textureWidth + " H = "+glayer.textureWidth);
+          console.log("EQR Texture W = "+glayer.textureWidth + " H = "+glayer.textureHeight);
 
           gl.viewport(0, 0, eqr_texture_width, eqr_texture_height);
           gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
@@ -563,7 +563,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           stereoUtil.blit(false, eqr_texture, 0, 0, 1, 1, eqr_texture_width, eqr_texture_height);
           
           glayer = xrGLFactory.getSubImage(cyl_layer, frame);
-          console.log("CYL Texture W = "+glayer.textureWidth + " H = "+glayer.textureWidth);
+          console.log("CYL Texture W = "+glayer.textureWidth + " H = "+glayer.textureHeight);
           gl.viewport(0, 0, cyl_texture_width, cyl_texture_height);
           gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
           gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, glayer.colorTexture, 0);
@@ -660,7 +660,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
               glLayer = xrGLFactory.getViewSubImage(proj_layer, view);
               if (frame_index < 3) {
-                console.log("PROJ Texture W = "+glLayer.textureWidth + " H = "+glLayer.textureWidth);
+                console.log("PROJ Texture W = "+glLayer.textureWidth + " H = "+glLayer.textureHeight);
               }
               glLayer.framebuffer = xrFramebuffer;
               viewport = glLayer.viewport;
