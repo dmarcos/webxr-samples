@@ -1,0 +1,43 @@
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1, user-scalable=no'>
+    <meta name='mobile-web-app-capable' content='yes'>
+    <meta name='apple-mobile-web-app-capable' content='yes'>
+    <link rel='icon' type='image/png' sizes='32x32' href='favicon-32x32.png'>
+    <link rel='icon' type='image/png' sizes='96x96' href='favicon-96x96.png'>
+    <link rel='stylesheet' href='css/common.css'>
+
+    <title>Multilayer</title>
+  </head>
+  <body>
+    <header>
+      <details open>
+        <summary>Barebones WebXR DOM Overlay</summary>
+        <p>
+          This sample demonstrates extremely simple use of an "immersive-ar"
+          session with no library dependencies, with an optional DOM overlay.
+          It doesn't render anything exciting, just draws a square with a slowly
+          changing color to prove it's working.
+          <a class="back" href="./index.html">Back</a>
+        </p>
+        <div id="session-info"></div>
+        <div id="warning-zone"></div>
+        <button id="xr-button" class="barebones-button" disabled>XR not found</button>
+      </details>
+    </header>
+    <main style='text-align: center;'>
+      <p>Click 'Enter AR' to see content</p>
+    </main>
+    <script type="module">
+      console.log("Jello!");
+      if (true) {
+        let aaa = 555;
+      }
+      if (true) {
+        aaa = 5;
+      }
+      console.log("Jello! "+aaa);
+    </script>
+  </body>
+</html>
