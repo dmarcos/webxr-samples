@@ -87,6 +87,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       let texture_copied = false;
       let stereoUtil = null;
       let number_of_images = 0;
+      let frame_index = 0;
 
       // WebGL scene globals.
       let stereo_layer = document.getElementById("stereo_layer");
@@ -423,6 +424,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         initGL();
 
         if (session.isImmersive) {
+          frame_index = 0;
           if (stereo_layer.checked) {
             number_of_images = 2;
             eqr_texture = loadTexture(gl, 'media/textures/chess-pano-4k.jpg', (w,h) => {
@@ -549,6 +551,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           let fb = gl.createFramebuffer();
           let glayer = xrGLFactory.getSubImage(eqr_layer, frame);
           
+          console.log("EQR Texture W = "+glayer.textureWidth + " H = "+glayer.textureWidth);
+
           gl.viewport(0, 0, eqr_texture_width, eqr_texture_height);
           gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
           gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, glayer.colorTexture, 0);
@@ -559,6 +563,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           stereoUtil.blit(false, eqr_texture, 0, 0, 1, 1, eqr_texture_width, eqr_texture_height);
           
           glayer = xrGLFactory.getSubImage(cyl_layer, frame);
+          console.log("CYL Texture W = "+glayer.textureWidth + " H = "+glayer.textureWidth);
           gl.viewport(0, 0, cyl_texture_width, cyl_texture_height);
           gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
           gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, glayer.colorTexture, 0);
@@ -654,7 +659,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             if (session.isImmersive) {
 
               glLayer = xrGLFactory.getViewSubImage(proj_layer, view);
-              
+              if (frame_index < 3) {
+                console.log("PROJ Texture W = "+glLayer.textureWidth + " H = "+glLayer.textureWidth);
+              }
               glLayer.framebuffer = xrFramebuffer;
               viewport = glLayer.viewport;
               gl.bindFramebuffer(gl.FRAMEBUFFER, xrFramebuffer);
@@ -690,6 +697,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         }
         
         scene.endFrame();
+        ++frame_index;
       }
 
       initXR();
