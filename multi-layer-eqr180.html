@@ -203,8 +203,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         if (want_msaa) {
           msaa_ext = gl.getExtension('EXT_multisampled_render_to_texture2');
           if (msaa_ext) {
-            console.log("EXT_multisampled_render_to_texture2 extension is supported");
             max_samples = gl.getParameter(gl.MAX_SAMPLES);
+            console.log("EXT_multisampled_render_to_texture2 extension is supported, MSAA samples = " + max_samples);
           }
           else {
             console.log("EXT_multisampled_render_to_texture2 extension is NOT supported");
