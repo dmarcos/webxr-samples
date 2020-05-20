@@ -46,7 +46,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         <input type="checkbox" id="stereo_layer" value="Bike">stereo equirect layer</input>
         <input type="checkbox" id="change_order">change order</input>
         <input type="checkbox" id="update_cylinder_every_frame">Update cyl every frm</input>
-        <input type="checkbox" id="want_msaa">Use MSAA</input>
         <input type="number" id="radius_txt" value="10">Radius</input>
       </details>
     </header>
@@ -94,7 +93,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
       // WebGL scene globals.
       let stereo_layer = document.getElementById("stereo_layer");
-      let want_msaa = document.getElementById("want_msaa");
+      let want_msaa = WGLUUrl.getBool('msaa', false);
       let gl = null;
       let renderer = null;
       let scene = new Scene();
