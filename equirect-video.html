@@ -247,10 +247,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           viewPixelHeight: video.videoHeight / 2,
           layout: "stereo-top-bottom"
         });
-        equirectlayer.centralHorizontalAngle = Math.PI;
-        equirectlayer.upperVerticalAngle = Math.PI / 2.0;
-        equirectlayer.lowerVerticalAngle = -Math.PI / 2.0;
-        equirectlayer.radius = 10;
+//        equirectlayer.centralHorizontalAngle = Math.PI;
+//        equirectlayer.upperVerticalAngle = Math.PI / 2.0;
+//        equirectlayer.lowerVerticalAngle = -Math.PI / 2.0;
+        equirectlayer.radius = 0;
 
         backgroundTexture = loadTexture(gl, 'media/textures/mono_equirect_test.png', (w, h) => {
           equirectlayerbackdrop = xrGLFactory.createEquirectLayer("texture", {
@@ -263,7 +263,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           equirectlayerbackdrop.centralHorizontalAngle = 2 * Math.PI;
           equirectlayerbackdrop.upperVerticalAngle = Math.PI / 2.0;
           equirectlayerbackdrop.lowerVerticalAngle = -Math.PI / 2.0;
-          equirectlayerbackdrop.radius = 20;
+          equirectlayerbackdrop.radius = 0;
           session.updateRenderState({ layers: [equirectlayerbackdrop, equirectlayer, proj_layer] });
         });
 
@@ -368,7 +368,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         scene.updateInputSources(frame, equirectlayer.space);
         scene.drawViewArray(views);
 
-        gl.deleteFramebuffer(fb);
+       // gl.deleteFramebuffer(fb);
         scene.endFrame();
       }
     }
