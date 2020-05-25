@@ -553,7 +553,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         session.requestAnimationFrame(onXRFrame);
 
         if (session.isImmersive &&
-            (cyl_layer.needsRedraw || eqr_layer.needsRedraw)) {
+            (cyl_layer.needsRedraw || eqr_layer.needsRedraw || update_cylinder_every_frame.checked)) {
           texture_copied = false;
         }
         if (session.isImmersive && !texture_copied) {
@@ -652,7 +652,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           // more efficient pattern anyway as a way of promoting best practices.
 
           // Updating cylinder layer every frame
-          if (update_cylinder_every_frame.checked && session.isImmersive) {
+/*          if (update_cylinder_every_frame.checked && session.isImmersive) {
             let glayer = xrGLFactory.getSubImage(cyl_layer, frame);
             let fb = gl.createFramebuffer();
             gl.viewport(0, 0, cyl_texture_width, cyl_texture_height);
@@ -666,7 +666,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
             gl.bindFramebuffer(gl.FRAMEBUFFER, null);
             gl.deleteFramebuffer(fb);
-          }
+          }  */
           let views = [];
           for (let view of pose.views) {
             let viewport = null;
