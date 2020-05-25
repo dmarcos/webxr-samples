@@ -232,7 +232,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       stereoUtil = new VRStereoUtil(gl);
       xrFramebuffer = gl.createFramebuffer();
       xrReadFramebuffer = gl.createFramebuffer();
-      videoTexture = gl.createTexture();
+//?      videoTexture = gl.createTexture();
 
       xrGLFactory = new XRWebGLBinding(session, gl);
 
@@ -305,16 +305,20 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       // disappear.
       if (pose) {
         let arraylength = session.renderState.layers.length;
-        gl.bindFramebuffer(gl.FRAMEBUFFER, xrFramebuffer);
-        let fb = gl.createFramebuffer();
+//        let fb = gl.createFramebuffer();
 
         if (updatevideo) {
           updatevideo = false;
           // draw video
           let glayer = xrGLFactory.getSubImage(equirectlayer, frame);
 
+          gl.bindTexture(gl.TEXTURE_2D, glayer.colorTexture);
+          gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, video.videoWidth, video.videoHeight, gl.RGBA, gl.UNSIGNED_BYTE, video);
+          
+          /*
+          
           gl.bindTexture(gl.TEXTURE_2D, videoTexture);
-          gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, video.videoWidth, video.videoHeight, 0, gl.RGB, gl.UNSIGNED_BYTE, video);
+          gl.texSubImage2D(gl.TEXTURE_2D, 0, gl.RGB, video.videoWidth, video.videoHeight, 0, gl.RGB, gl.UNSIGNED_BYTE, video);
           gl.generateMipmap(gl.TEXTURE_2D);
           gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
           gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
@@ -326,9 +330,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           gl.disable(gl.SCISSOR_TEST);
           stereoUtil.blit(false, videoTexture, 0, 0, 1, 1, video.videoWidth, video.videoHeight);
 
-          gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+          gl.bindFramebuffer(gl.FRAMEBUFFER, null);   */
         }
-
+                                                        /*
         if (equirectlayerbackdrop && equirectlayerbackdrop.needsRedraw) {
           let glayer = xrGLFactory.getSubImage(equirectlayerbackdrop, frame);
           gl.viewport(0, 0, glayer.textureWidth, glayer.textureHeight);
@@ -338,7 +342,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           gl.disable(gl.SCISSOR_TEST);
           stereoUtil.blit(false, backgroundTexture, 0, 0, 1, 1, equirectlayerbackdrop.viewPixelWidth, equirectlayerbackdrop.viewPixelHeight);
           gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-        }
+        }                                                 */
 
         let views = [];
         for (let view of pose.views) {
@@ -346,6 +350,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
           let glLayer = xrGLFactory.getViewSubImage(proj_layer, view);
 
+          gl.bindFramebuffer(gl.FRAMEBUFFER, xrFramebuffer);
           glLayer.framebuffer = xrFramebuffer;
           viewport = glLayer.viewport;
           gl.bindFramebuffer(gl.FRAMEBUFFER, xrFramebuffer);
