@@ -313,7 +313,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           let glayer = xrGLFactory.getSubImage(equirectlayer, frame);
 
           gl.bindTexture(gl.TEXTURE_2D, glayer.colorTexture);
-          gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, video.videoWidth, video.videoHeight, gl.RGBA, gl.UNSIGNED_BYTE, video);
+          gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, video.videoWidth, video.videoHeight, gl.RGB, gl.UNSIGNED_BYTE, video);
           
           /*
           
