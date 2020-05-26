@@ -152,6 +152,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
     let equirectlayerbackdrop = null;
     let proj_layer = null;
 
+    let videoHeight = -1;
+
     let video = document.createElement('video');
     video.loop = true;
     video.crossOrigin = "anonymous";
@@ -161,6 +163,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
     function videoSelect() {
       let s = document.getElementById("videoselect");
       video.src = s.options[s.selectedIndex].value;
+      // HACK
+      if (s.selectedIndex == 1) 
+        videoHeight = 2160;
+      else
+        videoHeight = -1;
     }
 
     videoSelect();
@@ -246,7 +253,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         equirectlayer = xrGLFactory.createEquirectLayer("texture", {
           space: refSpace,
           viewPixelWidth: video.videoWidth,
-          viewPixelHeight: video.videoHeight / 2,
+          viewPixelHeight: ((videoHeight == -1) ? video.videoHeight / 2 : videoHeight / 2),
           layout: "stereo-top-bottom"
         });
 //        equirectlayer.centralHorizontalAngle = Math.PI;
