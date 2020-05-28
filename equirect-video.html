@@ -52,6 +52,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         <option value="media/video/Henry_video_h265_1920x1920_60fps.mp4">1920x1920 60fps</option>
         <option value="media/video/Henry_video_h265_1920x1920_60fps.mp4">3840x3840 30fps</option>
       </select>
+      <input type="checkbox" id="update_every_frame">Update every frm</input>
       <button id="xr-button" disabled>XR not found</button>
     </details>
   </header>
@@ -316,7 +317,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         let arraylength = session.renderState.layers.length;
 //        let fb = gl.createFramebuffer();
 
-        if (updatevideo) {
+        if (updatevideo || update_every_frame.checked) {
           updatevideo = false;
           // draw video
           let glayer = xrGLFactory.getSubImage(equirectlayer, frame);
