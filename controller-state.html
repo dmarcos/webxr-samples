@@ -235,7 +235,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         if (pose) {
           boxTable[hand].matrix = pose.transform.matrix;
         }
-        if ("hapticActuators" in gamepad && gamepad.hapticActuators.length > 0) {
+        if ("hapticActuators" in gamepad && gamepad.hapticActuators != null && gamepad.hapticActuators.length > 0) {
           for (let j = 0; j < gamepad.buttons.length; ++j) {
             if (gamepad.buttons[j].pressed) {
               // Vibrate the gamepad using to the value of the button as
