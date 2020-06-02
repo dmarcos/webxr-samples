@@ -505,7 +505,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           if (depth_rb) {
             gl.bindRenderbuffer(gl.RENDERBUFFER, depth_rb);
             gl.renderbufferStorageMultisample(
-                gl.RENDERBUFFER, max_samples, gl.DEPTH_COMPONENT24, projlayer.viewPixelWidth*2, viewPixelHeight);
+                gl.RENDERBUFFER, max_samples, gl.DEPTH_COMPONENT24, projlayer.viewPixelWidth*2, projlayer.viewPixelHeight);
             gl.bindRenderbuffer(gl.RENDERBUFFER, null);
           }
 
