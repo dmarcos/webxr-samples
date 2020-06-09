@@ -514,7 +514,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             viewPixelWidth: eqr_texture_width, 
             viewPixelHeight: eqr_texture_height / (stereo_layer.checked ? 2 : 1), 
             layout: ((stereo_layer.checked) ? "stereo-top-bottom" : "mono"),
-            is_static: true
+            isStatic: true
           });
           eqrlayer.centralHorizontalAngle = Math.PI;
           eqrlayer.upperVerticalAngle = Math.PI / 2.0;
@@ -526,7 +526,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             viewPixelWidth: cyl_texture_width, 
             viewPixelHeight: cyl_texture_height / (stereo_layer.checked ? 2 : 1), 
             layout: ((stereo_layer.checked) ? "stereo-top-bottom" : "mono"),
-            is_static: true
+            isStatic: true
           });
           if (change_order.checked) {
             session.updateRenderState({ layers: [ eqrlayer, cyl_layer, projlayer ] });
