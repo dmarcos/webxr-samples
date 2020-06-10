@@ -589,6 +589,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           stereoUtil.blit(false, eqr_texture, 0, 0, 1, 1, eqr_texture_width, eqr_texture_height);
           
           glayer = xrGLFactory.getSubImage(cyl_layer, frame);
+          // testing how to calls to getSubImage work (or doesnt)
+          glayer = xrGLFactory.getSubImage(cyl_layer, frame);
           console.log("CYL Texture W = "+glayer.textureWidth + " H = "+glayer.textureHeight);
           gl.viewport(0, 0, cyl_texture_width, cyl_texture_height);
           gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
