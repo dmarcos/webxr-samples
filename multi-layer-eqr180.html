@@ -682,7 +682,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             gl.deleteFramebuffer(fb);
           }  */
           let views = [];
-          for (let view of pose.views) {
+//          for (let view of pose.views) {
+          for (let i = pose.views.length - 1; i >= 0; --i) {
+            let view = pose.views[i];
             let viewport = null;
             if (session.isImmersive) {
 
@@ -692,15 +694,15 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
               }
               glLayer.framebuffer = xrFramebuffer;
               viewport = glLayer.viewport;
-              gl.bindFramebuffer(gl.FRAMEBUFFER, xrFramebuffer);
+              gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, xrFramebuffer);
 
               if (!want_msaa) {
-                gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, glLayer.colorTexture, 0);
+                gl.framebufferTexture2D(gl.DRAW_FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, glLayer.colorTexture, 0);
 
                 if (do_stencil_buffer.checked) {
-                  gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.DEPTH_STENCIL_ATTACHMENT, gl.TEXTURE_2D, glLayer.depthStencilTexture, 0);
+                  gl.framebufferTexture2D(gl.DRAW_FRAMEBUFFER, gl.DEPTH_STENCIL_ATTACHMENT, gl.TEXTURE_2D, glLayer.depthStencilTexture, 0);
                 } else {
-                  gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, glLayer.depthStencilTexture, 0);
+                  gl.framebufferTexture2D(gl.DRAW_FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, glLayer.depthStencilTexture, 0);
                 }
               } else {
                 gl.framebufferRenderbuffer(
