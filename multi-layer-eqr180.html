@@ -744,23 +744,18 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         
         scene.endFrame();
 
-        if (want_msaa && session.isImmersive && pose) {
+        if (want_msaa && session.isImmersive) {
           gl.invalidateFramebuffer(gl.DRAW_FRAMEBUFFER, [gl.DEPTH_ATTACHMENT]);
-//          for (let view of pose.views) {
-          for (let i = pose.views.length - 1; i >= 0; --i) {
-            let view = pose.views[i];
-            let glLayer = xrGLFactory.getViewSubImage(proj_layer, view);
-            gl.bindFramebuffer(gl.READ_FRAMEBUFFER, xrFramebuffer);
-            gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, xrFinalFramebuffer);
-            gl.framebufferTexture2D(gl.DRAW_FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, glLayer.colorTexture, 0);
-            gl.readBuffer (gl.COLOR_ATTACHMENT0);
-            let viewport = glLayer.viewport;
-            gl.blitFramebuffer(viewport.x, viewport.y, viewport.width, viewport.height,
-                               viewport.x, viewport.y, viewport.width, viewport.height, gl.COLOR_BUFFER_BIT, gl.LINEAR);
+          let glLayer = xrGLFactory.getSubImage(proj_layer, frame);
+          gl.bindFramebuffer(gl.READ_FRAMEBUFFER, xrFramebuffer);
+          gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, xrFinalFramebuffer);
+          gl.framebufferTexture2D(gl.DRAW_FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, glLayer.colorTexture, 0);
+          gl.readBuffer (gl.COLOR_ATTACHMENT0);
+          gl.blitFramebuffer(0, 0, glLayer.textureWidth, glLayer.textureHeight,
+                             0, 0, glLayer.textureWidth, glLayer.textureHeight, gl.COLOR_BUFFER_BIT, gl.LINEAR);
 
-            gl.bindFramebuffer(gl.READ_FRAMEBUFFER, null);
-            gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, null);
-          }
+          gl.bindFramebuffer(gl.READ_FRAMEBUFFER, null);
+          gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, null);
         }
         ++frame_index;
       }
