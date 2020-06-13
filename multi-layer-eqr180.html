@@ -742,7 +742,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
         if (want_msaa && session.isImmersive && pose) {
           gl.invalidateFramebuffer(gl.DRAW_FRAMEBUFFER, [gl.DEPTH_ATTACHMENT]);
-          for (let view of pose.views) {
+//          for (let view of pose.views) {
+          for (let i = pose.views.length - 1; i >= 0; --i) {
+            let view = pose.views[i];
             let glLayer = xrGLFactory.getViewSubImage(proj_layer, view);
             gl.bindFramebuffer(gl.READ_FRAMEBUFFER, xrFramebuffer);
             gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, xrFinalFramebuffer);
