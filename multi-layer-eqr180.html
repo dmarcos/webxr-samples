@@ -494,32 +494,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         session.requestReferenceSpace('local').then((refSpace) => {
           let projlayer = xrGLFactory.createProjectionLayer("texture", {space: refSpace, depth: false, alpha: !noAlpha});
 
-          if (want_msaa) {
-            let num_textures = 1;
-            let w_mult = 1, h_mult = 1;
-            if (projlayer.layout == "stereo-left-right") {
-              w_mult = 2;
-            } else if (projlayer.layout == "stereo-top-bottom") {
-              h_mult = 2;
-            } else if (projlayer.layout != "mono") {
-              num_textures = 2; // is there a better way to figure out a number of textures? 
-            }
-            for (let i = 0; i < num_textures; ++i) {
-              let color_rb = gl.createRenderbuffer();
-              color_rbs.push(color_rb);
-              gl.bindRenderbuffer(gl.RENDERBUFFER, color_rb);
-              gl.renderbufferStorageMultisample(
-                  gl.RENDERBUFFER, max_samples, gl.RGBA8, projlayer.viewPixelWidth * w_mult, projlayer.viewPixelHeight * h_mult);
-
-              let depth_rb = gl.createRenderbuffer();
-              depth_rbs.push(depth_rb);
-              gl.bindRenderbuffer(gl.RENDERBUFFER, depth_rb);
-              gl.renderbufferStorageMultisample(
-                  gl.RENDERBUFFER, max_samples, gl.DEPTH_COMPONENT24, projlayer.viewPixelWidth * w_mult, projlayer.viewPixelHeight * h_mult);
-              gl.bindRenderbuffer(gl.RENDERBUFFER, null);
-            }
-          }
-
           let eqrlayer = xrGLFactory.createEquirectLayer("texture", {
             space: refSpace, 
             viewPixelWidth: eqr_texture_width, 
