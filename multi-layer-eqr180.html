@@ -80,7 +80,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       let xrImmersiveRefSpace = null;
       let inlineViewerHelper = null;
       let xrGLFactory = null;
-      let xrFramebuffer = null;
       let xrFinalFramebuffer = null;
       let xrDepthBuffer = null;
       let gl_ext = null;
@@ -110,8 +109,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       let eqr_layer_idx = 0;
       let proj_layer_idx = 1;
       let cyl_layer_idx = 2;
-      let depth_rb = null;
-      let color_rb = null;
+      let renderbuffers = [];
+      let framebuffers = [];
 
       function initXR() {
         xrButton = new WebXRButton({
@@ -203,8 +202,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
         if (want_msaa) {
           max_samples = gl.getParameter(gl.MAX_SAMPLES);
-          color_rb = gl.createRenderbuffer();
-          depth_rb = gl.createRenderbuffer();
         }
 
         function onResize() {
@@ -492,21 +489,35 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       function onImageLoaded(session) {
         if (--number_of_images != 0)
           return;
-        xrFramebuffer = gl.createFramebuffer();
         xrFinalFramebuffer = gl.createFramebuffer();
         xrGLFactory = new XRWebGLBinding(session, gl);
         session.requestReferenceSpace('local').then((refSpace) => {
           let projlayer = xrGLFactory.createProjectionLayer("texture", {space: refSpace, depth: false, alpha: !noAlpha});
 
           if (want_msaa) {
-            gl.bindRenderbuffer(gl.RENDERBUFFER, color_rb);
-            gl.renderbufferStorageMultisample(
-                gl.RENDERBUFFER, max_samples, gl.RGBA8, projlayer.viewPixelWidth*2, projlayer.viewPixelHeight);
+            let num_textures = 1;
+            let w_mult = 1, h_mult = 1;
+            if (projlayer.layout == "stereo-left-right") {
+              w_mult = 2;
+            } else if (projlayer.layout == "stereo-top-bottom") {
+              h_mult = 2;
+            } else if (projlayer.layout != "mono") {
+              num_textures = 2; // is there a better way to figure out a number of textures? 
+            }
+            for (let i = 0; i < num_textures; ++i) {
+              let color_rb = gl.createRenderbuffer();
+              color_rbs.push(color_rb);
+              gl.bindRenderbuffer(gl.RENDERBUFFER, color_rb);
+              gl.renderbufferStorageMultisample(
+                  gl.RENDERBUFFER, max_samples, gl.RGBA8, projlayer.viewPixelWidth * w_mult, projlayer.viewPixelHeight * h_mult);
 
-            gl.bindRenderbuffer(gl.RENDERBUFFER, depth_rb);
-            gl.renderbufferStorageMultisample(
-                gl.RENDERBUFFER, max_samples, gl.DEPTH_COMPONENT24, projlayer.viewPixelWidth*2, projlayer.viewPixelHeight);
-            gl.bindRenderbuffer(gl.RENDERBUFFER, null);
+              let depth_rb = gl.createRenderbuffer();
+              depth_rbs.push(depth_rb);
+              gl.bindRenderbuffer(gl.RENDERBUFFER, depth_rb);
+              gl.renderbufferStorageMultisample(
+                  gl.RENDERBUFFER, max_samples, gl.DEPTH_COMPONENT24, projlayer.viewPixelWidth * w_mult, projlayer.viewPixelHeight * h_mult);
+              gl.bindRenderbuffer(gl.RENDERBUFFER, null);
+            }
           }
 
           let eqrlayer = xrGLFactory.createEquirectLayer("texture", {
@@ -550,7 +561,37 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       function onSessionEnded(event) {
         if (event.session.isImmersive) {
           xrButton.setSession(null);
+          for (let rb of renderbuffers) {
+            gl.deleteRenderbuffer(rb.color_rb);
+            gl.deleteRenderbuffer(rb.depth_rb);
+          }
+          renderbuffers = [];
+          for (let fb of framebuffers) {
+            gl.deleteFramebuffer(fb);
+          }
+          framebuffers = [];
         }
+      }
+
+      function createRBForLayer(glLayer) {
+        let color_rb = gl.createRenderbuffer();
+        color_rbs.push(color_rb);
+        gl.bindRenderbuffer(gl.RENDERBUFFER, color_rb);
+        gl.renderbufferStorageMultisample(
+            gl.RENDERBUFFER, max_samples, gl.RGBA8, glLayer.textureWidth, glLayer.textureHeight);
+
+        let depth_rb = gl.createRenderbuffer();
+        depth_rbs.push(depth_rb);
+        gl.bindRenderbuffer(gl.RENDERBUFFER, depth_rb);
+        gl.renderbufferStorageMultisample(
+            gl.RENDERBUFFER, max_samples, gl.DEPTH_COMPONENT24, glLayer.textureWidth, glLayer.textureHeight);
+        gl.bindRenderbuffer(gl.RENDERBUFFER, null);
+
+        return {colorTexture : glLayer.colorTexture, 
+                textureWidth : glLayer.textureWidth,
+                textureHeight: glLayer.textureHeight,
+                color_rb : color_rb,
+                depth_rb : depth_rb } ;
       }
 
       function onXRFrame(t, frame) {
@@ -564,9 +605,41 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
         session.requestAnimationFrame(onXRFrame);
 
-        if (session.isImmersive &&
-            (cyl_layer.needsRedraw || eqr_layer.needsRedraw || update_cylinder_every_frame.checked)) {
-          texture_copied = false;
+        if (session.isImmersive) {
+          if (want_msaa && pose && renderbuffers.length == 0) {
+            // setup renderbuffers
+            let glLayer;
+            if (proj_layer.layout != "default") {
+              glLayer = xrGLFactory.getSubImage(proj_layer, frame);
+
+              let rb_desc = createRBForLayer(glLayer);
+              renderbuffers.push(rb_desc);
+            } else {
+              // multi texture 
+              for (let i = 0; i < pose.views.length; ++i) {
+                let view = pose.views[i];
+                glLayer = xrGLFactory.getViewSubImage(proj_layer, view);
+
+                let rb_desc = createRBForLayer(glLayer);
+                renderbuffers.push(rb_desc);
+              }
+            }
+          }
+
+          if (framebuffers.length == 0) {
+            if (proj_layer.layout != "default") {
+              framebuffers.push(gl.createFramebuffer());
+            } else {
+              // multi texture 
+              for (let i = 0; i < pose.views.length; ++i) {
+                framebuffers.push(gl.createFramebuffer());
+              }
+            }
+          }
+        
+          if (cyl_layer.needsRedraw || eqr_layer.needsRedraw || update_cylinder_every_frame.checked) {
+            texture_copied = false;
+          }
         }
         if (session.isImmersive && !texture_copied) {
           eqr_layer = session.renderState.layers[eqr_layer_idx];
@@ -611,14 +684,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         if (pose) {
           let glLayer = null;
 
-          if (session.isImmersive) {
-            gl.clearColor(0, 0, 0, 0);
-            gl.bindFramebuffer(gl.FRAMEBUFFER, xrFramebuffer);
-          } else {
+          if (!session.isImmersive) {
             glLayer = session.renderState.baseLayer;
             gl.bindFramebuffer(gl.FRAMEBUFFER, glLayer.framebuffer);
           }
-          gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
           // This is a different rendering pattern than the previous samples
           // used, but it should be more efficent. It's very common for apps
@@ -665,58 +734,43 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           // won't make much visible performance difference, but we're using the
           // more efficient pattern anyway as a way of promoting best practices.
 
-          // Updating cylinder layer every frame
-/*          if (update_cylinder_every_frame.checked && session.isImmersive) {
-            let glayer = xrGLFactory.getSubImage(cyl_layer, frame);
-            let fb = gl.createFramebuffer();
-            gl.viewport(0, 0, cyl_texture_width, cyl_texture_height);
-            gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
-            gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, glayer.colorTexture, 0);
-
-            gl.disable(gl.SCISSOR_TEST);
-            gl.clearColor(0, 1, 0, 1);
-            gl.clear(gl.COLOR_BUFFER_BIT);
-            stereoUtil.blit(false, cyl_texture, 0, 0, 1, 1, cyl_texture_width, cyl_texture_height);
-
-            gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-            gl.deleteFramebuffer(fb);
-          }  */
           let views = [];
-//          for (let view of pose.views) {
           for (let i = 0; i < pose.views.length; ++i) {
             let view = pose.views[i];
             let viewport = null;
             if (session.isImmersive) {
 
               glLayer = xrGLFactory.getViewSubImage(proj_layer, view);
-              if (frame_index < 3) {
-                console.log("PROJ Texture W = "+glLayer.textureWidth + " H = "+glLayer.textureHeight);
-              }
-              glLayer.framebuffer = xrFramebuffer;
+              glLayer.framebuffer = (i < framebuffers.length) ? framebuffers[i] : framebuffers[0];
               viewport = glLayer.viewport;
-              gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, xrFramebuffer);
+              if (i < framebuffers.length) {
+                gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, glLayer.framebuffer);
 
-              if (!want_msaa) {
-                gl.framebufferTexture2D(gl.DRAW_FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, glLayer.colorTexture, 0);
+                if (!want_msaa) {
+                  gl.framebufferTexture2D(gl.DRAW_FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, glLayer.colorTexture, 0);
 
-                if (do_stencil_buffer.checked) {
-                  gl.framebufferTexture2D(gl.DRAW_FRAMEBUFFER, gl.DEPTH_STENCIL_ATTACHMENT, gl.TEXTURE_2D, glLayer.depthStencilTexture, 0);
-                } else {
-                  gl.framebufferTexture2D(gl.DRAW_FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, glLayer.depthStencilTexture, 0);
-                }
-              } else {
-                if (i == 0) {
-                gl.framebufferRenderbuffer(
-                  gl.DRAW_FRAMEBUFFER,
-                  gl.COLOR_ATTACHMENT0,
-                  gl.RENDERBUFFER,
-                  color_rb);
-                gl.framebufferRenderbuffer(
-                  gl.DRAW_FRAMEBUFFER,
-                  gl.DEPTH_ATTACHMENT,
-                  gl.RENDERBUFFER,
-                  depth_rb);
+                  if (do_stencil_buffer.checked) {
+                    gl.framebufferTexture2D(gl.DRAW_FRAMEBUFFER, gl.DEPTH_STENCIL_ATTACHMENT, gl.TEXTURE_2D, glLayer.depthStencilTexture, 0);
+                  } else {
+                    gl.framebufferTexture2D(gl.DRAW_FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, glLayer.depthStencilTexture, 0);
                   }
+                } else if (i < renderbuffers.length) {
+                  let rb_desc = renderbuffers[i];
+                  if (rb_desc) {
+                    gl.framebufferRenderbuffer(
+                      gl.DRAW_FRAMEBUFFER,
+                      gl.COLOR_ATTACHMENT0,
+                      gl.RENDERBUFFER,
+                      rb_desc.color_rb);
+                    gl.framebufferRenderbuffer(
+                      gl.DRAW_FRAMEBUFFER,
+                      gl.DEPTH_ATTACHMENT,
+                      gl.RENDERBUFFER,
+                      rb_desc.depth_rb);
+                  }
+                }
+                gl.clearColor(0, 0, 0, 0);
+                gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT);
               }
             } else {
               viewport = glLayer.getViewport(view);
@@ -745,17 +799,20 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         scene.endFrame();
 
         if (want_msaa && session.isImmersive) {
-          gl.invalidateFramebuffer(gl.DRAW_FRAMEBUFFER, [gl.DEPTH_ATTACHMENT]);
-          let glLayer = xrGLFactory.getSubImage(proj_layer, frame);
-          gl.bindFramebuffer(gl.READ_FRAMEBUFFER, xrFramebuffer);
-          gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, xrFinalFramebuffer);
-          gl.framebufferTexture2D(gl.DRAW_FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, glLayer.colorTexture, 0);
-          gl.readBuffer (gl.COLOR_ATTACHMENT0);
-          gl.blitFramebuffer(0, 0, glLayer.textureWidth, glLayer.textureHeight,
-                             0, 0, glLayer.textureWidth, glLayer.textureHeight, gl.COLOR_BUFFER_BIT, gl.LINEAR);
+          for (let i = 0; i < renderbuffers.length; ++i) {
+            let rb = renderbuffers[i];
+            let fb = framebuffers[i];
+            gl.bindFramebuffer(gl.READ_FRAMEBUFFER, fb);
+            gl.invalidateFramebuffer(gl.DRAW_FRAMEBUFFER, [gl.DEPTH_ATTACHMENT, gl.STENCIL_ATTACHMENT]);
+            gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, xrFinalFramebuffer);
+            gl.framebufferTexture2D(gl.DRAW_FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, rb.colorTexture, 0);
+            gl.readBuffer (gl.COLOR_ATTACHMENT0);
+            gl.blitFramebuffer(0, 0, rb.textureWidth, rb.textureHeight,
+                               0, 0, rb.textureWidth, rb.textureHeight, gl.COLOR_BUFFER_BIT, gl.LINEAR);
 
-          gl.bindFramebuffer(gl.READ_FRAMEBUFFER, null);
-          gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, null);
+            gl.bindFramebuffer(gl.READ_FRAMEBUFFER, null);
+            gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, null);
+          }
         }
         ++frame_index;
       }
