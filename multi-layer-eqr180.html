@@ -773,7 +773,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             let rb = renderbuffers[i];
             let fb = framebuffers[i];
             gl.bindFramebuffer(gl.READ_FRAMEBUFFER, fb);
-            gl.invalidateFramebuffer(gl.DRAW_FRAMEBUFFER, [gl.DEPTH_ATTACHMENT, gl.STENCIL_ATTACHMENT]);
+            gl.invalidateFramebuffer(gl.READ_FRAMEBUFFER, [gl.DEPTH_ATTACHMENT, gl.STENCIL_ATTACHMENT]);
             gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, xrFinalFramebuffer);
             gl.framebufferTexture2D(gl.DRAW_FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, rb.colorTexture, 0);
             gl.readBuffer (gl.COLOR_ATTACHMENT0);
