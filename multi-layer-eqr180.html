@@ -715,6 +715,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
               viewport = glLayer.viewport;
               if (i < framebuffers.length) {
                 gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, glLayer.framebuffer);
+                gl.invalidateFramebuffer(gl.DRAW_FRAMEBUFFER, [gl.DEPTH_ATTACHMENT, gl.STENCIL_ATTACHMENT]);
 
                 if (!want_msaa) {
                   gl.framebufferTexture2D(gl.DRAW_FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, glLayer.colorTexture, 0);
