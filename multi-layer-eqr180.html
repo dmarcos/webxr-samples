@@ -714,6 +714,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
               glLayer.framebuffer = (i < framebuffers.length) ? framebuffers[i] : framebuffers[0];
               viewport = glLayer.viewport;
               if (i < framebuffers.length) {
+                gl.invalidateFramebuffer(gl.DRAW_FRAMEBUFFER, [gl.DEPTH_ATTACHMENT, gl.STENCIL_ATTACHMENT]);
                 gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, glLayer.framebuffer);
                 gl.invalidateFramebuffer(gl.DRAW_FRAMEBUFFER, [gl.DEPTH_ATTACHMENT, gl.STENCIL_ATTACHMENT]);
 
