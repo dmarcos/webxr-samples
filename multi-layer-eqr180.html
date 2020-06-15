@@ -549,13 +549,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
       function createRBForLayer(glLayer) {
         let color_rb = gl.createRenderbuffer();
-        color_rbs.push(color_rb);
         gl.bindRenderbuffer(gl.RENDERBUFFER, color_rb);
         gl.renderbufferStorageMultisample(
             gl.RENDERBUFFER, max_samples, gl.RGBA8, glLayer.textureWidth, glLayer.textureHeight);
 
         let depth_rb = gl.createRenderbuffer();
-        depth_rbs.push(depth_rb);
         gl.bindRenderbuffer(gl.RENDERBUFFER, depth_rb);
         gl.renderbufferStorageMultisample(
             gl.RENDERBUFFER, max_samples, gl.DEPTH_COMPONENT24, glLayer.textureWidth, glLayer.textureHeight);
