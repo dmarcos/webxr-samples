@@ -714,9 +714,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
               glLayer.framebuffer = (i < framebuffers.length) ? framebuffers[i] : framebuffers[0];
               viewport = glLayer.viewport;
               if (i < framebuffers.length) {
-                gl.invalidateFramebuffer(gl.DRAW_FRAMEBUFFER, [gl.DEPTH_ATTACHMENT, gl.STENCIL_ATTACHMENT]);
+                gl.invalidateFramebuffer(gl.DRAW_FRAMEBUFFER, [gl.DEPTH_STENCIL_ATTACHMENT]);
                 gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, glLayer.framebuffer);
-                gl.invalidateFramebuffer(gl.DRAW_FRAMEBUFFER, [gl.DEPTH_ATTACHMENT, gl.STENCIL_ATTACHMENT]);
+                gl.invalidateFramebuffer(gl.DRAW_FRAMEBUFFER, [gl.DEPTH_STENCIL_ATTACHMENT]);
 
                 if (!want_msaa) {
                   gl.framebufferTexture2D(gl.DRAW_FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, glLayer.colorTexture, 0);
@@ -769,14 +769,15 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         }
         
         scene.endFrame();
-       /*
+
         if (want_msaa && session.isImmersive) {
-          gl.invalidateFramebuffer(gl.DRAW_FRAMEBUFFER, [gl.DEPTH_ATTACHMENT, gl.STENCIL_ATTACHMENT]);
+          gl.invalidateFramebuffer(gl.DRAW_FRAMEBUFFER, [gl.DEPTH_STENCIL_ATTACHMENT]);
+          gl.invalidateFramebuffer(gl.READ_FRAMEBUFFER, [gl.DEPTH_STENCIL_ATTACHMENT]);
           for (let i = 0; i < renderbuffers.length; ++i) {
             let rb = renderbuffers[i];
             let fb = framebuffers[i];
             gl.bindFramebuffer(gl.READ_FRAMEBUFFER, fb);
-            gl.invalidateFramebuffer(gl.READ_FRAMEBUFFER, [gl.DEPTH_ATTACHMENT, gl.STENCIL_ATTACHMENT]);
+            gl.invalidateFramebuffer(gl.READ_FRAMEBUFFER, [gl.DEPTH_STENCIL_ATTACHMENT]);
             gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, xrFinalFramebuffer);
             gl.framebufferTexture2D(gl.DRAW_FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, rb.colorTexture, 0);
             gl.readBuffer (gl.COLOR_ATTACHMENT0);
@@ -786,7 +787,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             gl.bindFramebuffer(gl.READ_FRAMEBUFFER, null);
             gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, null);
           }
-        }*/
+        }
         ++frame_index;
       }
 
