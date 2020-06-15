@@ -580,6 +580,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         session.requestAnimationFrame(onXRFrame);
 
         if (session.isImmersive) {
+          eqr_layer = session.renderState.layers[eqr_layer_idx];
+          proj_layer = session.renderState.layers[proj_layer_idx];
+          cyl_layer = session.renderState.layers[cyl_layer_idx];
+
           if (want_msaa && pose && renderbuffers.length == 0) {
             // setup renderbuffers
             let glLayer;
@@ -616,10 +620,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           }
         }
         if (session.isImmersive && !texture_copied) {
-          eqr_layer = session.renderState.layers[eqr_layer_idx];
-          proj_layer = session.renderState.layers[proj_layer_idx];
-          cyl_layer = session.renderState.layers[cyl_layer_idx];
-
           texture_copied = true;
           let fb = gl.createFramebuffer();
           let glayer = xrGLFactory.getSubImage(eqr_layer, frame);
