@@ -775,7 +775,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         if (want_msaa && session.isImmersive) {
           gl.invalidateFramebuffer(gl.DRAW_FRAMEBUFFER, [gl.DEPTH_ATTACHMENT]);
           gl.invalidateFramebuffer(gl.READ_FRAMEBUFFER, [gl.DEPTH_ATTACHMENT]);
-          for (let i = 0; i < renderbuffers.length; ++i) {
+/*          for (let i = 0; i < renderbuffers.length; ++i) {
             let rb = renderbuffers[i];
             let fb = framebuffers[i];
             gl.bindFramebuffer(gl.READ_FRAMEBUFFER, fb);
@@ -789,7 +789,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             gl.invalidateFramebuffer(gl.READ_FRAMEBUFFER, [gl.COLOR_ATTACHMENT0, gl.DEPTH_ATTACHMENT]);
             gl.bindFramebuffer(gl.READ_FRAMEBUFFER, null);
             gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, null);
-          }
+          }    */
         }
         ++frame_index;
       }
