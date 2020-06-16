@@ -784,6 +784,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             gl.blitFramebuffer(0, 0, rb.textureWidth, rb.textureHeight,
                                0, 0, rb.textureWidth, rb.textureHeight, gl.COLOR_BUFFER_BIT, gl.LINEAR);
 
+            gl.invalidateFramebuffer(gl.READ_FRAMEBUFFER, [gl.COLOR_ATTACHMENT0, gl.DEPTH_STENCIL_ATTACHMENT]);
             gl.bindFramebuffer(gl.READ_FRAMEBUFFER, null);
             gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, null);
           }
