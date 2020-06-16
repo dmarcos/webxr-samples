@@ -757,15 +757,15 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             // values internally.
             views.push(new WebXRView(view, glLayer, viewport));
           }
-
+  /*
           // Check for and respond to any gamepad state changes.
           for (let source of session.inputSources) {
             if (source.gamepad) {
               let pose = frame.getPose(source.gripSpace, refSpace);
               ProcessGamepad(source.gamepad, source.handedness, pose);
             }
-          }
-          scene.updateInputSources(frame, refSpace);
+          }*/
+//?          scene.updateInputSources(frame, refSpace);
 //?          scene.drawViewArray(views);
         }
         
