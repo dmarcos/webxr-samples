@@ -210,9 +210,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           // touched and red if pressed. The box height will also scale based
           // on the button's value to make it appear like a button being pushed.
           for (let i = 0; i < gamepad.buttons.length; ++i) {
-            this.buttonBoxes[i].pressed = gamepad.buttons[i].pressed;
-            this.buttonBoxes[i].value = gamepad.buttons[i].value;
-            this.buttonBoxes[i].touched = gamepad.buttons[i].touched;
+            if (gamepad.buttons[i]) {
+              this.buttonBoxes[i].pressed = gamepad.buttons[i].pressed;
+              this.buttonBoxes[i].value = gamepad.buttons[i].value;
+              this.buttonBoxes[i].touched = gamepad.buttons[i].touched;
+            }
           }
 
           // Axes are assumed to come in X/Y pairs and will wiggle the
