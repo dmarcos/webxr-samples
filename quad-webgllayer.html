@@ -252,8 +252,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       xrReadFramebuffer = gl.createFramebuffer();
 
  //     xrGLFactory = new XRWebGLBinding(session, gl);
- 
-      session.updateRenderState({ baseLayer: new XRWebGLLayer(session, gl) });
+      let l = new XRWebGLLayer(session, gl);
+      session.updateRenderState({ baseLayer: l });
       session.requestReferenceSpace('local').then((refSpace) => {
         xrRefSpace = refSpace;
 
