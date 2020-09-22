@@ -251,20 +251,20 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       xrFramebuffer = gl.createFramebuffer();
       xrReadFramebuffer = gl.createFramebuffer();
 
-      xrGLFactory = new XRWebGLBinding(session, gl);
-
+ //     xrGLFactory = new XRWebGLBinding(session, gl);
+ 
+      session.updateRenderState({ baseLayer: new XRWebGLLayer(session, gl) });
       session.requestReferenceSpace('local').then((refSpace) => {
         xrRefSpace = refSpace;
 
-        quadLayer = xrGLFactory.createQuadLayer('texture', {
+/*        quadLayer = xrGLFactory.createQuadLayer('texture', {
           space: refSpace,
           viewPixelHeight: layerHeight,
           viewPixelWidth: layerWidth,
           width: layerWidth,
           height: layerHeight
         });
-
-        session.updateRenderState({ baseLayer: new XRWebGLLayer(session, gl) });
+  */
         //{ layers: [quadLayer] });
         
         // Inform the session that we're ready to begin drawing.
@@ -320,7 +320,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           gl.bindFramebuffer(gl.FRAMEBUFFER, null);
         }
 
-        if (quadLayer.needsRedraw) {
+        if (quadLayer && quadLayer.needsRedraw) {
           needsRedraw = false
 
           let fb = gl.createFramebuffer();
@@ -343,6 +343,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
         let views = [];
+        /*
         if (session.renderState.layers.length == 3) {
           for (let view of pose.views) {
             let viewport = null;
@@ -364,7 +365,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
             views.push(new WebXRView(view, glLayer, viewport));
           }
-        }
+        } */
 
         // Check for and respond to any gamepad state changes.
         for (let source of session.inputSources) {
