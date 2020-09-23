@@ -144,6 +144,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
     let gl = null;
     let quadLayer = null;
     let cyl_layer = null;
+    let proj_layer = null;
     let texture_copied = false;
 
     let layerHeight = 800;
@@ -287,8 +288,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         cyl_layer.transform = new XRRigidTransform(pos, {x: orient[0], y: orient[1], z: orient[2], w: orient[3]});
 
 
+        proj_layer = xrGLFactory.createProjectionLayer("texture", {space: refSpace});
 
-        session.updateRenderState({ layers: [quadLayer, cyl_layer] });
+        session.updateRenderState({ layers: [proj_layer, quadLayer, cyl_layer] });
         // Inform the session that we're ready to begin drawing.
         session.requestAnimationFrame(onXRFrame);
       });
@@ -366,7 +368,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
         let views = [];
-        if (session.renderState.layers.length == 3) {
+        if (proj_layer && pose) {
           for (let view of pose.views) {
             let viewport = null;
 
@@ -385,7 +387,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
             gl.disable(gl.SCISSOR_TEST);
 
-            views.push(new WebXRView(view, glLayer, viewport));
+            drawQuad(gl);
+
+            //views.push(new WebXRView(view, glLayer, viewport));
           }
         }
 
