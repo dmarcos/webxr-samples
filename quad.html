@@ -385,10 +385,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             gl.scissor(viewport.x, viewport.y, viewport.width, viewport.height);
             gl.clearColor(0.0, 0, 0, 0.0);
             gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-            gl.disable(gl.SCISSOR_TEST);
 
             gl.viewport(viewport.x + viewport.width/4, viewport.y + viewport.height/4, viewport.width/3, viewport.height/3);
             drawQuad(gl, {r:0,g:0,b:0.2,a:1});
+
+            gl.disable(gl.SCISSOR_TEST);
 
             //views.push(new WebXRView(view, glLayer, viewport));
           }
