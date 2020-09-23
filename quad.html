@@ -288,7 +288,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 
-        session.updateRenderState({ layers: [quadLayer] });
+        session.updateRenderState({ layers: [quadLayer, cyl_layer] });
         // Inform the session that we're ready to begin drawing.
         session.requestAnimationFrame(onXRFrame);
       });
