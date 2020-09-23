@@ -148,6 +148,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
     let layerHeight = 800;
     let layerWidth = 800;
 
+    let cylLayerHeight = 600;
+    let cylLayerWidth = 900;
+
     const lastFrameButtonsByGamepad = new WeakMap();
     function buttonPressedThisFrame(gamepad, lastFrameButtons, index) {
       return (index < gamepad.buttons.length &&
@@ -268,6 +271,22 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         //quat.fromEuler(orient, 0, 0, 30);
         quadLayer.transform = new XRRigidTransform(pos, {x: orient[0], y: orient[1], z: orient[2], w: orient[3]});
 
+        cyl_layer = xrGLFactory.createCylinderLayer("texture", {
+          space: refSpace,
+          viewPixelWidth: cylLayerWidth,
+          viewPixelHeight: cylLayerHeight, 
+          layout: "mono"
+        });
+        cyl_layer.centralAngle = 60 * Math.PI / 180;
+        cyl_layer.aspectRatio = cyl_layer.viewPixelWidth/cyl_layer.viewPixelHeight;
+        cyl_layer.radius = 2;
+        pos = {x: -1.0, y: 2.0, z: -2.0};
+        orient = quat.create();//{x:0,y:0,z:0,w:1};
+        quat.fromEuler(orient, 60, 30, 0);
+        cyl_layer.transform = new XRRigidTransform(pos, {x: orient[0], y: orient[1], z: orient[2], w: orient[3]});
+
+
+
         session.updateRenderState({ layers: [quadLayer] });
         // Inform the session that we're ready to begin drawing.
         session.requestAnimationFrame(onXRFrame);
@@ -311,6 +330,24 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           let fb = gl.createFramebuffer();
 
           let glayer = xrGLFactory.getSubImage(quadLayer, frame);
+
+          gl.disable(gl.SCISSOR_TEST);
+          gl.disable(gl.DEPTH_TEST);
+          gl.viewport(glayer.viewport.x, glayer.viewport.y, glayer.viewport.width, glayer.viewport.height);
+          gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
+          gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, glayer.colorTexture, 0);
+
+          drawQuad(gl);
+
+          gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+          gl.deleteFramebuffer(fb);
+        }
+        if (cyl_layer.needsRedraw) {
+          needsRedraw = false
+
+          let fb = gl.createFramebuffer();
+
+          let glayer = xrGLFactory.getSubImage(cyl_layer, frame);
 
           gl.disable(gl.SCISSOR_TEST);
           gl.disable(gl.DEPTH_TEST);
