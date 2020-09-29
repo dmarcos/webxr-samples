@@ -271,10 +271,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           space: refSpace,
           viewPixelHeight: layerHeight,
           viewPixelWidth: layerWidth,
-          width: layerWidthInMeters,
-          height: layerHeightInMeters
+ //         width: layerWidthInMeters,
+ //         height: layerHeightInMeters
         });
-        let pos = {x: 1.5, y: 1.0, z: -2.0};
+        let pos = {x: 1.5, y: 1.0, z: -10.0};
         let orient = quat.create();//{x:0,y:0,z:0,w:1};
         //quat.fromEuler(orient, 0, 0, 30);
         quadLayer.transform = new XRRigidTransform(pos, {x: orient[0], y: orient[1], z: orient[2], w: orient[3]});
@@ -353,8 +353,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           let fb = gl.createFramebuffer();
 
           let glayer = xrGLFactory.getSubImage(quadLayer, frame);
-          //quadLayer.width = 30;
-          //quadLayer.height = 10;
+          quadLayer.width = layerWidthInMeters;
+          quadLayer.height = layerHeightInMeters;
 
           gl.disable(gl.SCISSOR_TEST);
           gl.disable(gl.DEPTH_TEST);
