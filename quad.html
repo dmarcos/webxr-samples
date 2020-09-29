@@ -271,8 +271,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           space: refSpace,
           viewPixelHeight: layerHeight,
           viewPixelWidth: layerWidth,
-          width: layerWidthInMeters+15,
-          height: layerHeightInMeters+15
+          width: layerWidthInMeters,
+          height: layerHeightInMeters
         });
         let pos = {x: 1.5, y: 1.0, z: -2.0};
         let orient = quat.create();//{x:0,y:0,z:0,w:1};
@@ -353,8 +353,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           let fb = gl.createFramebuffer();
 
           let glayer = xrGLFactory.getSubImage(quadLayer, frame);
-          quadLayer.width = 30;
-          quadLayer.height = 10;
+          //quadLayer.width = 30;
+          //quadLayer.height = 10;
 
           gl.disable(gl.SCISSOR_TEST);
           gl.disable(gl.DEPTH_TEST);
