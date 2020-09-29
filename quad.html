@@ -373,6 +373,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           let fb = gl.createFramebuffer();
 
           let glayer = xrGLFactory.getSubImage(cyl_layer, frame);
+          cyl_layer.centralAngle = 120 * Math.PI / 180;
 
           gl.disable(gl.SCISSOR_TEST);
           gl.disable(gl.DEPTH_TEST);
