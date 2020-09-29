@@ -353,8 +353,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           let fb = gl.createFramebuffer();
 
           let glayer = xrGLFactory.getSubImage(quadLayer, frame);
-          //quadLayer.width = 1200;
-          //quadLayer.width = 1000;
+          quadLayer.width = 10;
+          quadLayer.height = 10;
 
           gl.disable(gl.SCISSOR_TEST);
           gl.disable(gl.DEPTH_TEST);
