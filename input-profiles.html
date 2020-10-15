@@ -188,7 +188,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
       function updateInputSources(session, frame, refSpace) {
         if (inpSrcChanged) {
-          console.log("updateInputSources " + session.inputSources);
+          console.log("updateInputSources " + session.inputSources.length);
+          for (let inputSource of session.inputSources) {
+            console.log(inputSource.handedness + " gamepad = " + inputSource.gamepad);
+          }
           inpSrcChanged = false;
         }
         for (let inputSource of session.inputSources) {
