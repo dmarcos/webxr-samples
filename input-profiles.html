@@ -185,6 +185,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       }
 
       function updateInputSources(session, frame, refSpace) {
+        console.log("Number of controllers " + session.inputSources.length);
         for (let inputSource of session.inputSources) {
           let targetRayPose = frame.getPose(inputSource.targetRaySpace, refSpace);
           if (!targetRayPose) {
